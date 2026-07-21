@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import List, Dict, Any
 
 API_URL = "https://skillscapes.csd.auth.gr/api/data/greek-tourism"
+EUROSTAT_GEOJSON_URL = "https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_60M_2021_4326_LEVL_2.geojson"
 logger = logging.getLogger(__name__)
 
 def get_tourism_data() -> List[Dict[str, Any]]:
@@ -34,6 +35,19 @@ def get_tourism_data() -> List[Dict[str, Any]]:
     except requests.exceptions.RequestException as e:
         logger.error(f"Error fetching data from API: {e}")
         sys.exit(1)
+
+def get_eurostat_boundaries() -> Dict[str, Any]:
+    """
+    Fetches official NUTS 2 geographic boundaries directly from Eurostat Open Data API.
+    """
+    try:
+        logger.info("Fetching Eurostat NUTS 2 geographic boundaries...")
+        response = requests.get(EUROSTAT_GEOJSON_URL, timeout=10)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        logger.warning(f"Could not fetch Eurostat boundaries: {e}")
+        return {}
 
 
 def save_raw_data(data: List[Dict[str, Any]], filename: str = "raw_data.json") -> None:
