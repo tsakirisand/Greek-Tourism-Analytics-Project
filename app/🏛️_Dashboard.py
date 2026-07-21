@@ -150,8 +150,8 @@ with export_pdf_col:
     except Exception as e:
         print(f"PDF export error: {e}")
 
-# Display the dataframe with nice formatting
-drop_cols = ["id", "geo"]
+# Display the dataframe with clean business columns
+drop_cols = ["id", "geo", "is_el_regional_unit", "country_code", "country_name", "nuts_level"]
 if "occupancy" in filtered_df.columns and filtered_df["occupancy"].sum() == 0:
     drop_cols.append("occupancy")
 
