@@ -61,10 +61,9 @@ def render_sidebar():
     st.sidebar.info(
         "🇬🇷 **Greek Tourism Analytics & Intelligence**\n\n"
         "Ολοκληρωμένο σύστημα ανάλυσης & Data Storytelling για τον ελληνικό τουρισμό (2019-2024).\n\n"
-        "**🌐 Πηγές Δεδομένων (Multi-Source):**\n"
+        "**🌐 Πηγές Δεδομένων:**\n"
         "• Skillscapes API (Πρωτογενή στοιχεία)\n"
-        "• Eurostat Open Data (GeoJSON & NUTS 2)\n"
-        "• Τράπεζα της Ελλάδος (Μακροοικονομικά)"
+        "• Eurostat Open Data (GeoJSON & NUTS 2)"
     )
     st.sidebar.markdown("---")
     st.sidebar.markdown(

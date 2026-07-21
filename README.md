@@ -8,7 +8,7 @@ An enterprise-grade data analytics and visualization application for Greek touri
 
 * **📊 Executive Dashboard (KPIs):** Macroeconomic overview tracking Arrivals, Overnights, Receipts, and Spend per Tourist (€) with custom interactive metric cards.
 * **🧠 Data Storytelling & Automated Insights:** Automated domain analysis quantifying COVID-19 V-shaped recovery, 70%+ regional revenue concentration, and tourist spending efficiency.
-* **🌐 Multi-Source Data Architecture:** Data pipeline integrating Skillscapes API (raw metrics), Eurostat Open Data (NUTS 2 GeoJSON maps), and Bank of Greece macroeconomic benchmarks.
+* **🌐 Multi-Source Data Architecture:** Data pipeline integrating Skillscapes API (raw metrics) and Eurostat Open Data (NUTS 2 GeoJSON maps).
 * **📈 Chronological Trends:** Interactive multi-year trend charts powered by Plotly with automated trend explanations.
 * **🗺️ Interactive Map of Greece (Regions):** GeoJSON-powered Choropleth map covering all 13 Greek NUTS 2 regions with dedicated tabs for Arrivals, Overnights, Receipts, and Side-by-Side Regional Comparisons.
 * **📄 Executive PDF & CSV Export:** Download auto-generated executive PDF summary reports and Excel-optimized CSV datasets (`UTF-8-SIG` encoding with `;` delimiter).
