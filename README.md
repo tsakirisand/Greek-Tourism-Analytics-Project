@@ -6,11 +6,13 @@ An enterprise-grade data analytics and visualization application for Greek touri
 
 ## 🌟 Key Features
 
-* **📊 Executive Dashboard (KPIs):** Macroeconomic overview tracking Arrivals, Overnights, and Receipts (in Billions of Euros) with custom interactive metric cards.
-* **📈 Chronological Trends:** Interactive multi-year trend charts powered by Plotly.
-* **🗺️ Interactive Map of Greece (Regions):** GeoJSON-powered Choropleth map covering all 13 Greek NUTS 2 regions with dedicated tabs for Arrivals, Overnights, and Receipts.
-* **📥 Excel-Optimized CSV Export:** Download filtered datasets formatted specifically for European/Greek Excel environments (`UTF-8-SIG` encoding with `;` delimiter).
-* **🐳 Production Ready (Docker):** Full Docker and Docker Compose setup for seamless containerized deployment on any cloud provider.
+* **📊 Executive Dashboard (KPIs):** Macroeconomic overview tracking Arrivals, Overnights, Receipts, and Spend per Tourist (€) with custom interactive metric cards.
+* **🧠 Data Storytelling & Automated Insights:** Automated domain analysis quantifying COVID-19 V-shaped recovery, 70%+ regional revenue concentration, and tourist spending efficiency.
+* **🌐 Multi-Source Data Architecture:** Data pipeline integrating Skillscapes API (raw metrics), Eurostat Open Data (NUTS 2 GeoJSON maps), and Bank of Greece macroeconomic benchmarks.
+* **📈 Chronological Trends:** Interactive multi-year trend charts powered by Plotly with automated trend explanations.
+* **🗺️ Interactive Map of Greece (Regions):** GeoJSON-powered Choropleth map covering all 13 Greek NUTS 2 regions with dedicated tabs for Arrivals, Overnights, Receipts, and Side-by-Side Regional Comparisons.
+* **📄 Executive PDF & CSV Export:** Download auto-generated executive PDF summary reports and Excel-optimized CSV datasets (`UTF-8-SIG` encoding with `;` delimiter).
+* **🐳 Production Ready (Docker):** Full Docker and Docker Compose setup for seamless containerized deployment.
 
 ---
 

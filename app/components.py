@@ -59,17 +59,19 @@ def render_sidebar():
     """Renders the common premium sidebar with info and health status."""
     st.sidebar.markdown("### ℹ️ Πληροφορίες")
     st.sidebar.info(
-        "🇬🇷 **Greek Tourism Dashboard**\n\n"
-        "Η εφαρμογή παρουσιάζει επίσημα στοιχεία τουρισμού (Αφίξεις, Διανυκτερεύσεις, Έσοδα) "
-        "για την Ελλάδα την περίοδο 2019-2024.\n\n"
-        "**Δεδομένα:** Skillscapes API"
+        "🇬🇷 **Greek Tourism Analytics & Intelligence**\n\n"
+        "Ολοκληρωμένο σύστημα ανάλυσης & Data Storytelling για τον ελληνικό τουρισμό (2019-2024).\n\n"
+        "**🌐 Πηγές Δεδομένων (Multi-Source):**\n"
+        "• Skillscapes API (Πρωτογενή στοιχεία)\n"
+        "• Eurostat Open Data (GeoJSON & NUTS 2)\n"
+        "• Τράπεζα της Ελλάδος (Μακροοικονομικά)"
     )
     st.sidebar.markdown("---")
     st.sidebar.markdown(
         "<div style='background:#f0f9ff; padding:12px; border-radius:8px; border:1px solid #bae6fd; font-size:0.85rem; color:#0369a1;'>"
         "<strong>🟢 System Status:</strong> Active<br>"
-        "<strong>⚡ Data Range:</strong> 2019 - 2024<br>"
-        "<strong>📊 Level:</strong> NUTS 2 (Regions)"
+        "<strong>⚡ Pipeline:</strong> Multi-Source Ingestion<br>"
+        "<strong>📊 Scope:</strong> NUTS 2 (13 Περιφέρειες)"
         "</div>",
         unsafe_allow_html=True
     )
