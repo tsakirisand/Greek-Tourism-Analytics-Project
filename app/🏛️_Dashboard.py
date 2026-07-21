@@ -7,7 +7,7 @@ import os
 # Add the parent directory to sys.path so we can import from database
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database import get_engine
-from app.components import apply_custom_css, render_sidebar
+from app.components import apply_custom_css, render_sidebar, load_fallback_df
 
 st.set_page_config(
     page_title="Greek Tourism Dashboard",
@@ -23,24 +23,22 @@ st.markdown("Καλώς ήρθατε στο κεντρικό ταμπλό δεδ
 
 @st.cache_data(ttl=3600)
 def load_data() -> pd.DataFrame:
-    # Fetch all data, we will filter by NUTS level in pandas
     query = "SELECT * FROM tourism_data"
     try:
         engine = get_engine()
-        with engine.connect() as conn:
-            df = pd.read_sql(text(query), conn)
-            
-        # Receipts are in Millions of Euros, Turnover is in Thousands of Euros
-        # Convert them to absolute numbers so they display correctly (e.g. Billions)
-        if 'receipts' in df.columns:
-            df['receipts'] = df['receipts'] * 1_000_000
-        if 'turnover' in df.columns:
-            df['turnover'] = df['turnover'] * 1_000
-            
-        return df
+        if engine:
+            with engine.connect() as conn:
+                df = pd.read_sql(text(query), conn)
+            if not df.empty:
+                if 'receipts' in df.columns:
+                    df['receipts'] = df['receipts'] * 1_000_000
+                if 'turnover' in df.columns:
+                    df['turnover'] = df['turnover'] * 1_000
+                return df
     except Exception as e:
-        st.error(f"Σφάλμα σύνδεσης με τη βάση: {e}")
-        return pd.DataFrame()
+        pass
+        
+    return load_fallback_df()
 
 with st.spinner("Φόρτωση δεδομένων..."):
     df = load_data()

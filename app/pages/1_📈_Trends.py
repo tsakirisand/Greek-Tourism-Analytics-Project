@@ -7,7 +7,7 @@ import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from database import get_engine
-from app.components import apply_custom_css, render_sidebar
+from app.components import apply_custom_css, render_sidebar, load_fallback_df
 
 st.set_page_config(page_title="Ανάλυση Τάσεων", page_icon="📈", layout="wide")
 apply_custom_css()
@@ -20,18 +20,19 @@ def load_data() -> pd.DataFrame:
     query = "SELECT * FROM tourism_data"
     try:
         engine = get_engine()
-        with engine.connect() as conn:
-            df = pd.read_sql(text(query), conn)
-            
-        if 'receipts' in df.columns:
-            df['receipts'] = df['receipts'] * 1_000_000
-        if 'turnover' in df.columns:
-            df['turnover'] = df['turnover'] * 1_000
-            
-        return df
+        if engine:
+            with engine.connect() as conn:
+                df = pd.read_sql(text(query), conn)
+            if not df.empty:
+                if 'receipts' in df.columns:
+                    df['receipts'] = df['receipts'] * 1_000_000
+                if 'turnover' in df.columns:
+                    df['turnover'] = df['turnover'] * 1_000
+                return df
     except Exception as e:
-        st.error(f"Σφάλμα σύνδεσης με τη βάση: {e}")
-        return pd.DataFrame()
+        pass
+        
+    return load_fallback_df()
 
 df = load_data()
 

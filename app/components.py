@@ -58,3 +58,28 @@ def render_sidebar():
         "για την Ελλάδα την περίοδο 2019-2024.\n\n"
         "**Δεδομένα:** Skillscapes API"
     )
+
+def load_fallback_df():
+    """Loads fallback data from local JSON file if database is unavailable."""
+    import os
+    import pandas as pd
+    json_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "raw_data.json")
+    if not os.path.exists(json_path):
+        return pd.DataFrame()
+    try:
+        df = pd.read_json(json_path)
+        rename_map = {
+            "hotels_total_arrivals": "arrivals",
+            "hotels_total_overnights": "overnights",
+            "hotels_occupancy": "occupancy",
+            "turnover_total": "turnover"
+        }
+        df = df.rename(columns=rename_map)
+        if 'receipts' in df.columns:
+            df['receipts'] = df['receipts'] * 1_000_000
+        if 'turnover' in df.columns:
+            df['turnover'] = df['turnover'] * 1_000
+        return df
+    except Exception as e:
+        print(f"Fallback load error: {e}")
+        return pd.DataFrame()
