@@ -11,34 +11,40 @@ def apply_custom_css():
                 font-family: 'Inter', sans-serif;
             }
             
-            /* Metric Card Styling with Hover Effects */
+            /* Metric Card Styling with Hover Effects & Equal Heights */
             .metric-card {
                 background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-                padding: 24px;
-                border-radius: 12px;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+                padding: 20px 12px;
+                border-radius: 14px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.04);
                 border: 1px solid #eef2f5;
                 text-align: center;
                 transition: all 0.3s ease;
-                margin-bottom: 20px;
+                height: 135px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
             }
             .metric-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 10px 15px rgba(0, 91, 174, 0.15);
+                transform: translateY(-4px);
+                box-shadow: 0 10px 20px rgba(0, 91, 174, 0.12);
                 border-color: #005BAE;
             }
             .metric-value {
-                font-size: 2.5rem;
+                font-size: 2.1rem;
                 font-weight: 800;
                 color: #005BAE;
-                margin-top: 10px;
+                margin-top: 6px;
+                line-height: 1.1;
             }
             .metric-label {
-                font-size: 1.1rem;
-                font-weight: 600;
-                color: #64748b;
+                font-size: 0.85rem;
+                font-weight: 700;
+                color: #475569;
                 text-transform: uppercase;
-                letter-spacing: 1px;
+                letter-spacing: 0.5px;
+                white-space: nowrap;
             }
             
             /* Make dataframe headers look premium */

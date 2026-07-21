@@ -79,7 +79,7 @@ with col2:
 with col3:
     st.markdown(f'<div class="metric-card"><div class="metric-label">Συνολικά Έσοδα (€)</div><div class="metric-value">{format_number(total_receipts)}</div></div>', unsafe_allow_html=True)
 with col4:
-    st.markdown(f'<div class="metric-card"><div class="metric-label">Μέση Δαπάνη / Αφιξη</div><div class="metric-value">{avg_spend_per_tourist:.0f} €</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="metric-card"><div class="metric-label">Δαπάνη / Αφιξη</div><div class="metric-value">{avg_spend_per_tourist:.0f} €</div></div>', unsafe_allow_html=True)
 
 # --- TOP PERFORMING REGIONS HIGHLIGHTS ---
 st.markdown("### 🏆 Κορυφαίες Περιφέρειες (Highlights)")
