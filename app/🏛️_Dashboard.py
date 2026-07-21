@@ -99,41 +99,33 @@ with h_col2:
     st.info(f"🚀 **Πρώτη Περιφέρεια σε Αφίξεις:** **{top_arrivals_reg}** με **{format_number(top_arrivals_val)}** συνολικούς επισκέπτες.")
 
 # --- EXECUTIVE DATA STORYTELLING & INSIGHTS ---
-st.markdown("### 🧠 Σημαντικά Ευρήματα & Αναλυτικά Συμπεράσματα (Data Insights)")
+st.markdown("### 🧠 Σημαντικά Ευρήματα & Αναλυτικά Συμπεράσματα")
 
-ins_col1, ins_col2, ins_col3 = st.columns(3)
-with ins_col1:
-    st.markdown(
-        "<div style='background:#ffffff; padding:18px; border-radius:12px; border-left:5px solid #005BAE; box-shadow:0 2px 8px rgba(0,0,0,0.05);'>"
-        "<h4 style='color:#005BAE; margin-top:0;'>📉 Ανάκαμψη COVID-19 (V-Shape)</h4>"
-        "<p style='font-size:0.9rem; color:#475569; margin:0;'>"
-        "Τα έσοδα υπέστησαν κάθετη πτώση (-70%) το 2020 λόγω πανδημίας (5.07B €), αλλά η αγορά επέδειξε ταχύτατη ανάκαμψη φτάνοντας σε <strong>ιστορικά ρεκόρ όλων των εποχών το 2023-2024 (25.34B €)</strong>."
-        "</p>"
-        "</div>",
-        unsafe_allow_html=True
-    )
-
-with ins_col2:
-    st.markdown(
-        "<div style='background:#ffffff; padding:18px; border-radius:12px; border-left:5px solid #2ca02c; box-shadow:0 2px 8px rgba(0,0,0,0.05);'>"
-        "<h4 style='color:#2ca02c; margin-top:0;'>⚖️ Γεωγραφική Συγκέντρωση</h4>"
-        "<p style='font-size:0.9rem; color:#475569; margin:0;'>"
-        "Μόλις <strong>3 από τις 13 Περιφέρειες</strong> (<em>Νότιο Αιγαίο, Αττική, Κρήτη</em>) συγκεντρώνουν πάνω από το <strong>70% του συνολικού τουριστικού πλούτου</strong> της χώρας, αναδεικνύοντας ανάγκη περιφερειακής διασποράς."
-        "</p>"
-        "</div>",
-        unsafe_allow_html=True
-    )
-
-with ins_col3:
-    st.markdown(
-        "<div style='background:#ffffff; padding:18px; border-radius:12px; border-left:5px solid #ff7f0e; box-shadow:0 2px 8px rgba(0,0,0,0.05);'>"
-        "<h4 style='color:#ff7f0e; margin-top:0;'>💶 Ποιοτική Δαπάνη / Τουρίστη</h4>"
-        "<p style='font-size:0.9rem; color:#475569; margin:0;'>"
-        "Η μέση δαπάνη ανά τουρίστη ανέρχεται στα <strong>~680 €</strong>. Περιφέρειες όπως το <em>Νότιο Αιγαίο</em> προσελκύουν τουρίστες υψηλής δαπάνης (~1.100 €/αφιξη), ενώ η <em>Στερεά Ελλάδα</em> έχει χαμηλότερη δαπάνη (~300 €)."
-        "</p>"
-        "</div>",
-        unsafe_allow_html=True
-    )
+st.markdown(
+    """
+    <div style='background:#ffffff; padding:22px 28px; border-radius:14px; border:1px solid #e2e8f0; box-shadow:0 4px 12px rgba(0,0,0,0.03); margin-bottom:24px;'>
+        <div style='margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #f1f5f9;'>
+            <h4 style='color:#005BAE; margin:0 0 6px 0; font-size:1.15rem;'>📉 1. Ανάκαμψη COVID-19 (V-Shape Recovery)</h4>
+            <p style='color:#475569; font-size:0.95rem; margin:0; line-height:1.5;'>
+                Τα έσοδα υπέστησαν κάθετη πτώση (-70%) το 2020 λόγω πανδημίας (5.07B €), αλλά η αγορά επέδειξε ταχύτατη ανάκαμψη φτάνοντας σε <strong>ιστορικά ρεκόρ όλων των εποχών το 2023-2024 (25.34B €)</strong>.
+            </p>
+        </div>
+        <div style='margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #f1f5f9;'>
+            <h4 style='color:#2ca02c; margin:0 0 6px 0; font-size:1.15rem;'>⚖️ 2. Υψηλή Γεωγραφική Συγκέντρωση</h4>
+            <p style='color:#475569; font-size:0.95rem; margin:0; line-height:1.5;'>
+                Μόλις <strong>3 από τις 13 Περιφέρειες</strong> (<em>Νότιο Αιγαίο, Αττική, Κρήτη</em>) συγκεντρώνουν πάνω από το <strong>70% του συνολικού τουριστικού πλούτου</strong> της χώρας, αναδεικνύοντας επιτακτική ανάγκη περιφερειακής διασποράς.
+            </p>
+        </div>
+        <div>
+            <h4 style='color:#ff7f0e; margin:0 0 6px 0; font-size:1.15rem;'>💶 3. Ποιοτική Δαπάνη ανά Επισκέπτη</h4>
+            <p style='color:#475569; font-size:0.95rem; margin:0; line-height:1.5;'>
+                Η μέση δαπάνη ανά τουρίστη ανέρχεται στα <strong>~680 €</strong>. Περιφέρειες όπως το <em>Νότιο Αιγαίο</em> προσελκύουν τουρίστες υψηλής δαπάνης (~1.100 €/αφιξη), ενώ η <em>Στερεά Ελλάδα</em> καταγράφει χαμηλότερη δαπάνη (~300 €).
+            </p>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 st.divider()
 
