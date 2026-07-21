@@ -108,8 +108,8 @@ else:
 
 st.divider()
 
-# Create tabs for charts instead of squished columns
-tab1, tab2, tab3 = st.tabs(["📊 Αφίξεις", "🛏️ Διανυκτερεύσεις", "💶 Έσοδα"])
+# Create tabs for charts and side-by-side comparison
+tab1, tab2, tab3, tab4 = st.tabs(["📊 Αφίξεις", "🛏️ Διανυκτερεύσεις", "💶 Έσοδα", "⚔️ Σύγκριση Περιφερειών"])
 
 with tab1:
     st.subheader("Top 10 Περιοχές (Αφίξεις)")
@@ -138,6 +138,35 @@ with tab2:
     )
     fig_bar_overnights.update_layout(yaxis={'categoryorder':'total ascending'}, height=500)
     st.plotly_chart(fig_bar_overnights, use_container_width=True)
+
+with tab4:
+    st.subheader("⚔️ Σύγκριση Δύο Περιφερειών (Side-by-Side Comparison)")
+    all_regions = sorted(df['geo_label'].unique().tolist())
+    comp_col1, comp_col2 = st.columns(2)
+    
+    with comp_col1:
+        reg_a = st.selectbox("Επιλογή Περιφέρειας Α:", all_regions, index=0)
+    with comp_col2:
+        default_idx = 1 if len(all_regions) > 1 else 0
+        reg_b = st.selectbox("Επιλογή Περιφέρειας Β:", all_regions, index=default_idx)
+        
+    df_comp = df[df['geo_label'].isin([reg_a, reg_b])].groupby(['geo_label', 'year'])[['arrivals', 'overnights', 'receipts']].sum().reset_index()
+    
+    st.markdown(f"#### 📊 Σύγκριση Εσόδων (€): **{reg_a}** vs **{reg_b}**")
+    fig_comp_rec = px.bar(
+        df_comp, x="year", y="receipts", color="geo_label", barmode="group",
+        labels={"year": "Έτος", "receipts": "Έσοδα (€)", "geo_label": "Περιφέρεια"},
+        color_discrete_sequence=["#005BAE", "#ff7f0e"]
+    )
+    st.plotly_chart(fig_comp_rec, use_container_width=True)
+    
+    st.markdown(f"#### 🚀 Σύγκριση Αφίξεων: **{reg_a}** vs **{reg_b}**")
+    fig_comp_arr = px.bar(
+        df_comp, x="year", y="arrivals", color="geo_label", barmode="group",
+        labels={"year": "Έτος", "arrivals": "Αφίξεις", "geo_label": "Περιοχή"},
+        color_discrete_sequence=["#005BAE", "#2ca02c"]
+    )
+    st.plotly_chart(fig_comp_arr, use_container_width=True)
 
 with tab3:
     st.subheader("Μερίδιο Εσόδων")

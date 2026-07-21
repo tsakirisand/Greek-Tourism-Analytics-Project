@@ -7,7 +7,7 @@ import os
 # Add the parent directory to sys.path so we can import from database
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database import get_engine
-from app.components import apply_custom_css, render_sidebar, load_fallback_df
+from app.components import apply_custom_css, render_sidebar, load_fallback_df, generate_pdf_report
 
 st.set_page_config(
     page_title="Greek Tourism Dashboard",
@@ -57,40 +57,34 @@ df = df[df['geo'].str.len() == 4]
 st.subheader(f"Συνολικά Στατιστικά - Περιφέρειες (NUTS 2)")
 
 total_arrivals = df["arrivals"].sum()
-total_overnights = df["overnights"].sum()
-avg_occupancy = df["occupancy"].mean()
-total_receipts = df["receipts"].sum()
+avg_spend_per_tourist = total_receipts / total_arrivals if total_arrivals > 0 else 0
 
-def format_number(num):
-    if num >= 1_000_000_000:
-        return f"{num/1_000_000_000:.2f}B"
-    elif num >= 1_000_000:
-        return f"{num/1_000_000:.2f}M"
-    elif num >= 1_000:
-        return f"{num/1_000:.1f}K"
-    else:
-        return f"{num:.0f}"
+col1, col2, col3, col4 = st.columns(4)
+with col1:
+    st.markdown(f'<div class="metric-card"><div class="metric-label">Συνολικές Αφίξεις</div><div class="metric-value">{format_number(total_arrivals)}</div></div>', unsafe_allow_html=True)
+with col2:
+    st.markdown(f'<div class="metric-card"><div class="metric-label">Διανυκτερεύσεις</div><div class="metric-value">{format_number(total_overnights)}</div></div>', unsafe_allow_html=True)
+with col3:
+    st.markdown(f'<div class="metric-card"><div class="metric-label">Συνολικά Έσοδα (€)</div><div class="metric-value">{format_number(total_receipts)}</div></div>', unsafe_allow_html=True)
+with col4:
+    st.markdown(f'<div class="metric-card"><div class="metric-label">Μέση Δαπάνη / Αφιξη</div><div class="metric-value">{avg_spend_per_tourist:.0f} €</div></div>', unsafe_allow_html=True)
 
-has_occupancy = df["occupancy"].sum() > 0
+# --- TOP PERFORMING REGIONS HIGHLIGHTS ---
+st.markdown("### 🏆 Κορυφαίες Περιφέρειες (Highlights)")
 
-if has_occupancy:
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.markdown(f'<div class="metric-card"><div class="metric-label">Συνολικές Αφίξεις</div><div class="metric-value">{format_number(total_arrivals)}</div></div>', unsafe_allow_html=True)
-    with col2:
-        st.markdown(f'<div class="metric-card"><div class="metric-label">Διανυκτερεύσεις</div><div class="metric-value">{format_number(total_overnights)}</div></div>', unsafe_allow_html=True)
-    with col3:
-        st.markdown(f'<div class="metric-card"><div class="metric-label">Μέση Πληρότητα</div><div class="metric-value">{avg_occupancy:.1f}%</div></div>', unsafe_allow_html=True)
-    with col4:
-        st.markdown(f'<div class="metric-card"><div class="metric-label">Συνολικά Έσοδα (€)</div><div class="metric-value">{format_number(total_receipts)}</div></div>', unsafe_allow_html=True)
-else:
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.markdown(f'<div class="metric-card"><div class="metric-label">Συνολικές Αφίξεις</div><div class="metric-value">{format_number(total_arrivals)}</div></div>', unsafe_allow_html=True)
-    with col2:
-        st.markdown(f'<div class="metric-card"><div class="metric-label">Διανυκτερεύσεις</div><div class="metric-value">{format_number(total_overnights)}</div></div>', unsafe_allow_html=True)
-    with col3:
-        st.markdown(f'<div class="metric-card"><div class="metric-label">Συνολικά Έσοδα (€)</div><div class="metric-value">{format_number(total_receipts)}</div></div>', unsafe_allow_html=True)
+# Compute top region by receipts & arrivals
+top_receipts_reg = df.groupby("geo_label")["receipts"].sum().idxmax() if "receipts" in df.columns else "N/A"
+top_receipts_val = df.groupby("geo_label")["receipts"].sum().max() if "receipts" in df.columns else 0
+top_receipts_pct = (top_receipts_val / total_receipts * 100) if total_receipts > 0 else 0
+
+top_arrivals_reg = df.groupby("geo_label")["arrivals"].sum().idxmax() if "arrivals" in df.columns else "N/A"
+top_arrivals_val = df.groupby("geo_label")["arrivals"].sum().max() if "arrivals" in df.columns else 0
+
+h_col1, h_col2 = st.columns(2)
+with h_col1:
+    st.success(f"🥇 **Πρωταθλήτρια Περιφέρεια (Έσοδα):** **{top_receipts_reg}** με **{format_number(top_receipts_val)} €** (καλύπτει το **{top_receipts_pct:.1f}%** των συνολικών εσόδων της χώρας).")
+with h_col2:
+    st.info(f"🚀 **Πρώτη Περιφέρεια σε Αφίξεις:** **{top_arrivals_reg}** με **{format_number(top_arrivals_val)}** συνολικούς επισκέπτες.")
 
 st.divider()
 
@@ -103,8 +97,8 @@ st.subheader("Εξερεύνηση Δεδομένων")
 def convert_df(df):
     return df.to_csv(index=False, sep=';', decimal=',').encode('utf-8-sig')
 
-# Add some layout for filters
-filter_col1, filter_col2, export_col = st.columns([2, 2, 1])
+# Add layout for filters and exports
+filter_col1, filter_col2, export_csv_col, export_pdf_col = st.columns([2, 2, 1, 1])
 
 with filter_col1:
     regions = ["Όλες οι Περιοχές"] + sorted(df['geo_label'].unique().tolist())
@@ -121,15 +115,28 @@ if selected_region != "Όλες οι Περιοχές":
 if selected_year != "Όλα τα Έτη":
     filtered_df = filtered_df[filtered_df['year'] == selected_year]
 
-with export_col:
-    st.markdown("<br>", unsafe_allow_html=True) # visual alignment
+with export_csv_col:
+    st.markdown("<br>", unsafe_allow_html=True)
     csv = convert_df(filtered_df)
     st.download_button(
-        label="📥 Λήψη (CSV)",
+        label="📥 CSV",
         data=csv,
         file_name='tourism_data.csv',
         mime='text/csv',
     )
+
+with export_pdf_col:
+    st.markdown("<br>", unsafe_allow_html=True)
+    try:
+        pdf_data = generate_pdf_report(filtered_df)
+        st.download_button(
+            label="📄 PDF Summary",
+            data=pdf_data,
+            file_name='tourism_summary_report.pdf',
+            mime='application/pdf',
+        )
+    except Exception as e:
+        print(f"PDF export error: {e}")
 
 # Display the dataframe with nice formatting
 drop_cols = ["id", "geo"]
