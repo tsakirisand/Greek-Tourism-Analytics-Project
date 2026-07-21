@@ -71,15 +71,26 @@ def format_number(num):
     else:
         return f"{num:.0f}"
 
-col1, col2, col3, col4 = st.columns(4)
-with col1:
-    st.markdown(f'<div class="metric-card"><div class="metric-label">Συνολικές Αφίξεις</div><div class="metric-value">{format_number(total_arrivals)}</div></div>', unsafe_allow_html=True)
-with col2:
-    st.markdown(f'<div class="metric-card"><div class="metric-label">Διανυκτερεύσεις</div><div class="metric-value">{format_number(total_overnights)}</div></div>', unsafe_allow_html=True)
-with col3:
-    st.markdown(f'<div class="metric-card"><div class="metric-label">Μέση Πληρότητα</div><div class="metric-value">{avg_occupancy:.1f}%</div></div>', unsafe_allow_html=True)
-with col4:
-    st.markdown(f'<div class="metric-card"><div class="metric-label">Συνολικά Έσοδα (€)</div><div class="metric-value">{format_number(total_receipts)}</div></div>', unsafe_allow_html=True)
+has_occupancy = df["occupancy"].sum() > 0
+
+if has_occupancy:
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.markdown(f'<div class="metric-card"><div class="metric-label">Συνολικές Αφίξεις</div><div class="metric-value">{format_number(total_arrivals)}</div></div>', unsafe_allow_html=True)
+    with col2:
+        st.markdown(f'<div class="metric-card"><div class="metric-label">Διανυκτερεύσεις</div><div class="metric-value">{format_number(total_overnights)}</div></div>', unsafe_allow_html=True)
+    with col3:
+        st.markdown(f'<div class="metric-card"><div class="metric-label">Μέση Πληρότητα</div><div class="metric-value">{avg_occupancy:.1f}%</div></div>', unsafe_allow_html=True)
+    with col4:
+        st.markdown(f'<div class="metric-card"><div class="metric-label">Συνολικά Έσοδα (€)</div><div class="metric-value">{format_number(total_receipts)}</div></div>', unsafe_allow_html=True)
+else:
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(f'<div class="metric-card"><div class="metric-label">Συνολικές Αφίξεις</div><div class="metric-value">{format_number(total_arrivals)}</div></div>', unsafe_allow_html=True)
+    with col2:
+        st.markdown(f'<div class="metric-card"><div class="metric-label">Διανυκτερεύσεις</div><div class="metric-value">{format_number(total_overnights)}</div></div>', unsafe_allow_html=True)
+    with col3:
+        st.markdown(f'<div class="metric-card"><div class="metric-label">Συνολικά Έσοδα (€)</div><div class="metric-value">{format_number(total_receipts)}</div></div>', unsafe_allow_html=True)
 
 st.divider()
 
