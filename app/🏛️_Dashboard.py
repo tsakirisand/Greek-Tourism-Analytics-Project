@@ -56,8 +56,20 @@ df = df[df['geo'].str.len() == 4]
 # Overall KPIs
 st.subheader(f"Συνολικά Στατιστικά - Περιφέρειες (NUTS 2)")
 
-total_arrivals = df["arrivals"].sum()
+total_arrivals = df["arrivals"].sum() if "arrivals" in df.columns else 0
+total_overnights = df["overnights"].sum() if "overnights" in df.columns else 0
+total_receipts = df["receipts"].sum() if "receipts" in df.columns else 0
 avg_spend_per_tourist = total_receipts / total_arrivals if total_arrivals > 0 else 0
+
+def format_number(num):
+    if num >= 1_000_000_000:
+        return f"{num/1_000_000_000:.2f}B"
+    elif num >= 1_000_000:
+        return f"{num/1_000_000:.2f}M"
+    elif num >= 1_000:
+        return f"{num/1_000:.1f}K"
+    else:
+        return f"{num:.0f}"
 
 col1, col2, col3, col4 = st.columns(4)
 with col1:
