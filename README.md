@@ -1,22 +1,22 @@
 # 🇬🇷 Greek Tourism Analytics Dashboard (2019-2024)
 
-Πλήρης enterprise εφαρμογή ανάλυσης και οπτικοποίησης δεδομένων ελληνικού τουρισμού (Αφίξεις, Διανυκτερεύσεις, Έσοδα) για την περίοδο 2019-2024. Η εφαρμογή είναι κατασκευασμένη με **Python**, **Streamlit**, **PostgreSQL**, **Plotly** και **Docker**.
+An enterprise-grade data analytics and visualization application for Greek tourism statistics (Arrivals, Overnights, Receipts) covering the 2019-2024 period. Built with **Python**, **Streamlit**, **PostgreSQL**, **Plotly**, and **Docker**.
 
 ---
 
-## 🌟 Χαρακτηριστικά (Features)
+## 🌟 Key Features
 
-* **📊 Κεντρικό Ταμπλό (KPIs):** Συνολικά στατιστικά στοιχεία (Αφίξεις, Διανυκτερεύσεις, Έσοδα σε Δισεκατομμύρια €) με διαδραστικά Metric Cards.
-* **📈 Χρονολογική Ανάλυση (Trends):** Γραφήματα εξέλιξης του τουρισμού ανά έτος.
-* **🗺️ Διαδραστικός Χάρτης Ελλάδας (Regions):** Χωροπληθικός χάρτης (Choropleth Map) των 13 Περιφερειών της Ελλάδας (NUTS 2) με GeoJSON και αναλυτικές καρτέλες (Tabs) για Αφίξεις, Διανυκτερεύσεις και Έσοδα.
-* **📥 Εξαγωγή Δεδομένων (CSV Export):** Δυνατότητα λήψης των φιλτραρισμένων δεδομένων σε μορφή CSV, ειδικά διαμορφωμένη για το ελληνικό Excel (`UTF-8-SIG`, διαχωριστής `;`).
-* **🐳 Dockerized Deployment:** Πλήρης υποστήριξη Docker & Docker Compose για άμεσο deployment σε οποιοδήποτε Cloud περιβάλλον.
+* **📊 Executive Dashboard (KPIs):** Macroeconomic overview tracking Arrivals, Overnights, and Receipts (in Billions of Euros) with custom interactive metric cards.
+* **📈 Chronological Trends:** Interactive multi-year trend charts powered by Plotly.
+* **🗺️ Interactive Map of Greece (Regions):** GeoJSON-powered Choropleth map covering all 13 Greek NUTS 2 regions with dedicated tabs for Arrivals, Overnights, and Receipts.
+* **📥 Excel-Optimized CSV Export:** Download filtered datasets formatted specifically for European/Greek Excel environments (`UTF-8-SIG` encoding with `;` delimiter).
+* **🐳 Production Ready (Docker):** Full Docker and Docker Compose setup for seamless containerized deployment on any cloud provider.
 
 ---
 
-## 🛠️ Τεχνολογικό Stack
+## 🛠️ Tech Stack
 
-* **Frontend / UI:** [Streamlit](https://streamlit.io/) με Custom CSS (Inter font, Hover effects, Navy Theme)
+* **Frontend / UI:** [Streamlit](https://streamlit.io/) with Custom CSS (Inter font, Glassmorphism hover effects, Navy Theme)
 * **Visualizations:** [Plotly Express](https://plotly.com/python/)
 * **Backend & ETL:** Python 3.10+, Pandas, SQLAlchemy
 * **Database:** PostgreSQL
@@ -24,34 +24,34 @@
 
 ---
 
-## 🚀 Οδηγίες Εγκατάστασης & Λειτουργίας
+## 🚀 Setup & Installation
 
-### 1. Τοπική Εγκατάσταση (Local Run)
+### 1. Local Run
 
-#### Προαπαιτούμενα:
+#### Prerequisites:
 * Python 3.10+
-* PostgreSQL εγκατεστημένη και σε λειτουργία
+* Running PostgreSQL instance
 
-#### Βήματα:
-1. **Clone το Repository:**
+#### Steps:
+1. **Clone the Repository:**
    ```bash
-   git clone https://github.com/your-username/GreekTourismProject.git
-   cd GreekTourismProject
+   git clone https://github.com/tsakirisand/Greek-Tourism-Analytics-Project.git
+   cd Greek-Tourism-Analytics-Project
    ```
 
-2. **Δημιουργία & Ενεργοποίηση Virtual Environment:**
+2. **Create & Activate Virtual Environment:**
    ```bash
    python3 -m venv venv
    source venv/bin/activate
    ```
 
-3. **Εγκατάσταση Εξαρτήσεων:**
+3. **Install Dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Ρύθμιση Μεταβλητών Περιβάλλοντος (`.env`):**
-   Δημιουργήστε ένα αρχείο `.env` στη ρίζα του project:
+4. **Environment Variables (`.env`):**
+   Create a `.env` file in the project root directory:
    ```env
    DB_USER=postgres
    DB_PASSWORD=your_password
@@ -60,59 +60,57 @@
    DB_NAME=greek_tourism
    ```
 
-5. **Αρχικοποίηση Βάσης & Φόρτωση Δεδομένων:**
+5. **Initialize Database & Load Data:**
    ```bash
-   # Δημιουργία πινάκων στη PostgreSQL
+   # Create database tables
    python main.py --init-db
 
-   # Φόρτωση δεδομένων από το API
+   # Extract from API and load into PostgreSQL
    python main.py --load-data
    ```
 
-6. **Εκκίνηση Εφαρμογής (Streamlit):**
+6. **Launch Dashboard:**
    ```bash
    python main.py --dashboard
    ```
-   Η εφαρμογή θα ανοίξει στη διεύθυνση `http://localhost:8501`.
+   Access the dashboard at `http://localhost:8501`.
 
 ---
 
-### 2. Εκκίνηση με Docker Compose (Προτεινόμενο για Server / Production)
+### 2. Run with Docker Compose (Recommended for Cloud Hosting)
 
-Δεν απαιτείται προεγκατεστημένη Python ή PostgreSQL!
+No local Python or PostgreSQL installation required!
 
 ```bash
-# Εκκίνηση της Βάσης Δεδομένων και του Streamlit App
 docker-compose up --build
 ```
 
-Η εφαρμογή θα είναι διαθέσιμη στο `http://localhost:8501`.
+Access the dashboard at `http://localhost:8501`.
 
 ---
 
-## 📁 Δομή Project
+## 📁 Project Structure
 
 ```text
 GreekTourismProject/
 ├── app/
-│   ├── 🏛️_Dashboard.py        # Κεντρική Σελίδα Streamlit
-│   ├── components.py           # Κοινά UI στοιχεία & CSS
+│   ├── 🏛️_Dashboard.py        # Streamlit Main Dashboard
+│   ├── components.py           # Shared UI components & Custom CSS
 │   └── pages/
-│       ├── 1_📈_Trends.py      # Σελίδα Χρονολογικής Ανάλυσης
-│       └── 2_🗺️_Regions.py     # Σελίδα Χάρτη & Περιφερειών
-├── api_client.py               # Client για τη λήψη δεδομένων από το API
+│       ├── 1_📈_Trends.py      # Chronological Trends Page
+│       └── 2_🗺️_Regions.py     # Regional Analysis & Interactive Map
+├── api_client.py               # API Client for data extraction
 ├── loader.py                   # ETL Pipeline (API -> PostgreSQL)
-├── create_tables.py            # Σχήμα Βάσης Δεδομένων
+├── create_tables.py            # Database Schema definition
 ├── database.py                 # SQLAlchemy Connection Engine
 ├── main.py                     # CLI Entry Point
-├── Dockerfile                  # Docker image configuration
-├── docker-compose.yml          # Docker Compose orchestration
+├── Dockerfile                  # Container build instructions
+├── docker-compose.yml          # Container orchestration
 └── requirements.txt            # Python Dependencies
 ```
 
 ---
 
-## 📄 Άδεια Χρήσης (License)
+## 📄 License
 
 MIT License © 2026 Greek Tourism Analytics Project
-# Greek-Tourism-Analytics-Project

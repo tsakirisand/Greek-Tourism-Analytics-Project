@@ -1,0 +1,25 @@
+# Environments
+.env
+.venv
+venv/
+env/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE / OS
+.DS_Store
+.idea/
+.vscode/
+
+# Streamlit
+.streamlit/credentials.toml
+
+# Database
+*.sqlite3
+*.db
+
+# Docker
+docker-compose.override.yml
