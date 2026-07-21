@@ -11,18 +11,24 @@ load_dotenv()
 
 def get_database_url() -> str:
     """Constructs the database URL from environment variables."""
-    # Check for direct DATABASE_URL (commonly provided by Cloud hosts like Render/Railway/Heroku)
     db_url = os.getenv("DATABASE_URL")
     if db_url:
         if db_url.startswith("postgres://"):
             db_url = db_url.replace("postgres://", "postgresql://", 1)
+        if "@" in db_url:
+            base, target = db_url.rsplit("@", 1)
+            target = target.replace(":/", "/")
+            db_url = f"{base}@{target}"
         return db_url
 
-    user = os.getenv("DB_USER", "postgres")
-    password = os.getenv("DB_PASSWORD", "password")
-    host = os.getenv("DB_HOST", "localhost")
-    port = os.getenv("DB_PORT", "5432") or "5432"
-    db_name = os.getenv("DB_NAME", "greek_tourism")
+    user = os.getenv("DB_USER", "postgres") or "postgres"
+    password = os.getenv("DB_PASSWORD", "password") or "password"
+    host = os.getenv("DB_HOST", "localhost") or "localhost"
+    
+    port_env = str(os.getenv("DB_PORT", "")).strip()
+    port = port_env if (port_env and port_env.isdigit()) else "5432"
+    
+    db_name = os.getenv("DB_NAME", "greek_tourism") or "greek_tourism"
 
     return f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
 
