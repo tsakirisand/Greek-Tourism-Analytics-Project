@@ -11,24 +11,18 @@ load_dotenv()
 
 def get_database_url() -> str:
     """Constructs the database URL from environment variables."""
-    user = os.getenv("DB_USER")
-    password = os.getenv("DB_PASSWORD")
-    host = os.getenv("DB_HOST")
-    port = os.getenv("DB_PORT")
-    db_name = os.getenv("DB_NAME")
+    # Check for direct DATABASE_URL (commonly provided by Cloud hosts like Render/Railway/Heroku)
+    db_url = os.getenv("DATABASE_URL")
+    if db_url:
+        if db_url.startswith("postgres://"):
+            db_url = db_url.replace("postgres://", "postgresql://", 1)
+        return db_url
 
-    # Error handling for missing env vars
-    missing_vars = []
-    if not user: missing_vars.append("DB_USER")
-    if not password: missing_vars.append("DB_PASSWORD")
-    if not host: missing_vars.append("DB_HOST")
-    if not port: missing_vars.append("DB_PORT")
-    if not db_name: missing_vars.append("DB_NAME")
-
-    if missing_vars:
-        print(f"Error: Missing environment variables: {', '.join(missing_vars)}")
-        print("Please ensure your .env file is properly configured.")
-        sys.exit(1)
+    user = os.getenv("DB_USER", "postgres")
+    password = os.getenv("DB_PASSWORD", "password")
+    host = os.getenv("DB_HOST", "localhost")
+    port = os.getenv("DB_PORT", "5432") or "5432"
+    db_name = os.getenv("DB_NAME", "greek_tourism")
 
     return f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
 
