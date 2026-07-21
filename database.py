@@ -33,17 +33,24 @@ def get_database_url() -> str:
     return f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
 
 def get_engine():
-    """Returns a SQLAlchemy engine instance."""
-    return create_engine(get_database_url())
+    """Returns a SQLAlchemy engine instance safely."""
+    try:
+        url = get_database_url()
+        return create_engine(url)
+    except Exception as e:
+        print(f"Warning: Could not create database engine: {e}")
+        return None
 
 def get_session():
     """Returns a new SQLAlchemy session."""
     engine = get_engine()
+    if not engine:
+        return None
     Session = sessionmaker(bind=engine)
     return Session()
 
-# Create the engine eagerly so other modules can import it if needed
+# Create the engine safely so other modules importing it will not crash
 try:
     engine = get_engine()
-except SystemExit:
+except Exception:
     engine = None
