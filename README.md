@@ -4,13 +4,19 @@ An enterprise-grade data analytics and visualization application for Greek touri
 
 ---
 
+## 🌐 Live Demo
+🔗 **Public Application URL:** [greek-tourism-analytics-project.onrender.com](https://greek-tourism-analytics-project.onrender.com)
+
+---
+
 ## 🌟 Key Features
 
 * **📊 Executive Dashboard (KPIs):** Macroeconomic overview tracking Arrivals, Overnights, Receipts, and Spend per Tourist (€) with custom interactive metric cards.
 * **🧠 Data Storytelling & Automated Insights:** Automated domain analysis quantifying COVID-19 V-shaped recovery, 70%+ regional revenue concentration, and tourist spending efficiency.
-* **🌐 Multi-Source Data Architecture:** Data pipeline integrating Skillscapes API (raw metrics) and Eurostat Open Data (NUTS 2 GeoJSON maps).
+* **💡 Standalone Insights Page (`3_💡_Insights.py`):** Dedicated page featuring in-depth analysis on pandemic shock, regional economic disparities, tourist spending rankings, and executive action plans.
+* **🌐 Multi-Source Data Architecture:** Data pipeline integrating Skillscapes API (raw metrics) and Eurostat Open Data API (NUTS 2 GeoJSON boundaries).
 * **📈 Chronological Trends:** Interactive multi-year trend charts powered by Plotly with automated trend explanations.
-* **🗺️ Interactive Map of Greece (Regions):** GeoJSON-powered Choropleth map covering all 13 Greek NUTS 2 regions with dedicated tabs for Arrivals, Overnights, Receipts, and Side-by-Side Regional Comparisons.
+* **🗺️ Interactive Map & Regional Comparison:** GeoJSON-powered Choropleth map covering all 13 Greek NUTS 2 regions with dedicated tabs for Arrivals, Overnights, Receipts, and **Side-by-Side Regional Comparisons**.
 * **📄 Executive PDF & CSV Export:** Download auto-generated executive PDF summary reports and Excel-optimized CSV datasets (`UTF-8-SIG` encoding with `;` delimiter).
 * **🐳 Production Ready (Docker):** Full Docker and Docker Compose setup for seamless containerized deployment.
 
@@ -21,7 +27,7 @@ An enterprise-grade data analytics and visualization application for Greek touri
 * **Frontend / UI:** [Streamlit](https://streamlit.io/) with Custom CSS (Inter font, Glassmorphism hover effects, Navy Theme)
 * **Visualizations:** [Plotly Express](https://plotly.com/python/)
 * **Backend & ETL:** Python 3.10+, Pandas, SQLAlchemy
-* **Database:** PostgreSQL
+* **Database:** PostgreSQL (with automatic local JSON fallback for zero-downtime cloud hosting)
 * **Containerization:** Docker & Docker Compose
 
 ---
@@ -100,8 +106,9 @@ GreekTourismProject/
 │   ├── components.py           # Shared UI components & Custom CSS
 │   └── pages/
 │       ├── 1_📈_Trends.py      # Chronological Trends Page
-│       └── 2_🗺️_Regions.py     # Regional Analysis & Interactive Map
-├── api_client.py               # API Client for data extraction
+│       ├── 2_🗺️_Regions.py     # Regional Analysis & Interactive Map
+│       └── 3_💡_Insights.py    # Dedicated Data Insights & Storytelling
+├── api_client.py               # API Client for data extraction (Skillscapes & Eurostat)
 ├── loader.py                   # ETL Pipeline (API -> PostgreSQL)
 ├── create_tables.py            # Database Schema definition
 ├── database.py                 # SQLAlchemy Connection Engine
