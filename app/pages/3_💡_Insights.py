@@ -48,6 +48,47 @@ if df.empty:
 # Filter df by NUTS length (Lock to NUTS 2)
 df = df[df['geo'].str.len() == 4]
 
+# --- DYNAMIC ANALYTICS CALCULATIONS ---
+def format_number(num):
+    if num >= 1_000_000_000:
+        return f"{num/1_000_000_000:.2f}B"
+    elif num >= 1_000_000:
+        return f"{num/1_000_000:.2f}M"
+    elif num >= 1_000:
+        return f"{num/1_000:.1f}K"
+    else:
+        return f"{num:.0f}"
+
+total_arrivals = df["arrivals"].sum() if "arrivals" in df.columns else 0
+total_overnights = df["overnights"].sum() if "overnights" in df.columns else 0
+total_receipts = df["receipts"].sum() if "receipts" in df.columns else 0
+avg_spend_per_tourist = total_receipts / total_arrivals if total_arrivals > 0 else 0
+
+yearly_rec = df.groupby("year")["receipts"].sum()
+min_year_val = yearly_rec.min() if not yearly_rec.empty else 0
+max_year_val = yearly_rec.max() if not yearly_rec.empty else 0
+rec_multiplier = (max_year_val / min_year_val) if min_year_val > 0 else 1.0
+
+reg_rec = df.groupby("geo_label")["receipts"].sum().sort_values(ascending=False)
+total_reg_count = len(reg_rec)
+top3_regions_list = reg_rec.head(3).index.tolist()
+top3_regions_str = ", ".join(top3_regions_list)
+top3_sum = reg_rec.head(3).sum()
+total_rec_sum = reg_rec.sum()
+top3_pct_val = (top3_sum / total_rec_sum * 100) if total_rec_sum > 0 else 0
+rest_pct_val = 100.0 - top3_pct_val
+
+reg_spend = df.groupby("geo_label").apply(lambda g: g["receipts"].sum() / g["arrivals"].sum() if g["arrivals"].sum() > 0 else 0).sort_values(ascending=False)
+max_spend_reg_name = reg_spend.index[0] if not reg_spend.empty else "N/A"
+max_spend_reg_val = reg_spend.iloc[0] if not reg_spend.empty else 0
+min_spend_reg_name = reg_spend.index[-1] if not reg_spend.empty else "N/A"
+min_spend_reg_val = reg_spend.iloc[-1] if not reg_spend.empty else 1.0
+disp_ratio = (max_spend_reg_val / min_spend_reg_val) if min_spend_reg_val > 0 else 1.0
+
+ins1_body = t("insight_1_body", lang, min_val=format_number(min_year_val), max_val=format_number(max_year_val), multiplier=f"{rec_multiplier:.1f}")
+ins2_body = t("insight_2_body", lang, total_regions=total_reg_count, top_regions_str=top3_regions_str, top3_pct=f"{top3_pct_val:.1f}", top3_val=format_number(top3_sum), rest_pct=f"{rest_pct_val:.1f}")
+ins3_body = t("insight_3_body", lang, avg_spend=f"{avg_spend_per_tourist:.0f}", max_spend_region=max_spend_reg_name, max_spend_val=f"{max_spend_reg_val:.0f}", disparity_ratio=f"{disp_ratio:.1f}", min_spend_region=min_spend_reg_name, min_spend_val=f"{min_spend_reg_val:.0f}")
+
 # Main Insights Tabs
 tab_covid, tab_conc, tab_spend, tab_alos_yield, tab_rec = st.tabs([
     t("tab_covid", lang), 
@@ -72,7 +113,7 @@ with tab_covid:
         color_continuous_scale="Viridis"
     )
     st.plotly_chart(fig_rec, use_container_width=True)
-    st.info(t("insight_1_body", lang))
+    st.info(ins1_body)
 
 with tab_conc:
     st.subheader(t("insight_2_title", lang))
@@ -87,7 +128,7 @@ with tab_conc:
         hole=0.4
     )
     st.plotly_chart(fig_pie, use_container_width=True)
-    st.warning(t("insight_2_body", lang))
+    st.warning(ins2_body)
 
 with tab_spend:
     st.subheader(t("insight_3_title", lang))
@@ -105,7 +146,7 @@ with tab_spend:
     )
     fig_spend.update_layout(yaxis={'categoryorder':'total ascending'}, height=500)
     st.plotly_chart(fig_spend, use_container_width=True)
-    st.success(t("insight_3_body", lang))
+    st.success(ins3_body)
 
 with tab_alos_yield:
     st.subheader("⏱️ Average Length of Stay (ALOS) & Daily Yield Analysis")
@@ -158,17 +199,21 @@ with tab_rec:
         with col_inv1:
             st.markdown(
                 """
-                <div style='background:#f8fafc; padding:18px; border-radius:12px; border-top:4px solid #005BAE; border:1px solid #e2e8f0;'>
-                    <h4 style='color:#005BAE; margin-top:0;'>1. 💎 Luxury & High-Yield Capital</h4>
-                    <p><strong>Target Regions:</strong> South Aegean, Crete, Ionian Islands</p>
-                    <p><strong>Empirical Data Basis:</strong> Captures 70%+ of total national revenue with €110+ daily yield.</p>
-                    <p><strong>Recommended Investments:</strong></p>
-                    <ul>
-                        <li>5-Star luxury resort upgrades</li>
-                        <li>Marinas & mega-yachting infrastructure</li>
-                        <li>High-end gastronomy & wellness centers</li>
-                    </ul>
-                    <p><strong>ROI Objective:</strong> Maximize high-net-worth visitor yield.</p>
+                <div style='background:#ffffff; padding:20px; border-radius:12px; border-top:5px solid #005BAE; border:1px solid #cbd5e1; min-height:420px; display:flex; flex-direction:column; justify-content:space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.04);'>
+                    <div>
+                        <h4 style='color:#005BAE; margin-top:0;'>1. 💎 Luxury & High-Yield Capital</h4>
+                        <p><strong>Target Regions:</strong> South Aegean, Crete, Ionian Islands</p>
+                        <p><strong>Empirical Data Basis:</strong> Captures 70%+ of total national revenue with €110+ daily yield.</p>
+                        <p><strong>Recommended Investments:</strong></p>
+                        <ul style='padding-left: 20px;'>
+                            <li>5-Star luxury resort upgrades</li>
+                            <li>Marinas & mega-yachting infrastructure</li>
+                            <li>High-end gastronomy & wellness centers</li>
+                        </ul>
+                    </div>
+                    <div style='background:#f1f5f9; padding:10px 14px; border-radius:8px; margin-top:10px;'>
+                        <strong>ROI Objective:</strong> Maximize high-net-worth visitor yield.
+                    </div>
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -177,17 +222,21 @@ with tab_rec:
         with col_inv2:
             st.markdown(
                 """
-                <div style='background:#f8fafc; padding:18px; border-radius:12px; border-top:4px solid #2ca02c; border:1px solid #e2e8f0;'>
-                    <h4 style='color:#2ca02c; margin-top:0;'>2. 🏙️ Urban Extended-Stay & MICE</h4>
-                    <p><strong>Target Regions:</strong> Attica, Central Macedonia</p>
-                    <p><strong>Empirical Data Basis:</strong> High visitor volume (>10M arrivals) but lower ALOS (~3.7 days).</p>
-                    <p><strong>Recommended Investments:</strong></p>
-                    <ul>
-                        <li>International MICE / Conference Centers</li>
-                        <li>365-day boutique city-break hotels</li>
-                        <li>Digital nomad co-living apartments</li>
-                    </ul>
-                    <p><strong>ROI Objective:</strong> Stretching ALOS from 3.7 to 4.5 days yields <strong>+21% revenue growth (+€1.2B/yr)</strong>.</p>
+                <div style='background:#ffffff; padding:20px; border-radius:12px; border-top:5px solid #2ca02c; border:1px solid #cbd5e1; min-height:420px; display:flex; flex-direction:column; justify-content:space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.04);'>
+                    <div>
+                        <h4 style='color:#2ca02c; margin-top:0;'>2. 🏙️ Urban Extended-Stay & MICE</h4>
+                        <p><strong>Target Regions:</strong> Attica, Central Macedonia</p>
+                        <p><strong>Empirical Data Basis:</strong> High visitor volume (>10M arrivals) but lower ALOS (~3.7 days).</p>
+                        <p><strong>Recommended Investments:</strong></p>
+                        <ul style='padding-left: 20px;'>
+                            <li>International MICE / Conference Centers</li>
+                            <li>365-day boutique city-break hotels</li>
+                            <li>Digital nomad co-living apartments</li>
+                        </ul>
+                    </div>
+                    <div style='background:#f1f5f9; padding:10px 14px; border-radius:8px; margin-top:10px;'>
+                        <strong>ROI Objective:</strong> Stretching ALOS from 3.7 to 4.5 days yields <strong>+21% revenue growth (+€1.2B/yr)</strong>.
+                    </div>
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -196,17 +245,21 @@ with tab_rec:
         with col_inv3:
             st.markdown(
                 """
-                <div style='background:#f8fafc; padding:18px; border-radius:12px; border-top:4px solid #ff7f0e; border:1px solid #e2e8f0;'>
-                    <h4 style='color:#ff7f0e; margin-top:0;'>3. 🌿 Regional Growth & Ecotourism</h4>
-                    <p><strong>Target Regions:</strong> Epirus, Thessaly, Western Greece</p>
-                    <p><strong>Empirical Data Basis:</strong> Under 10% revenue share despite prime natural assets.</p>
-                    <p><strong>Recommended Investments:</strong></p>
-                    <ul>
-                        <li>Agri-tourism & mountain eco-lodges</li>
-                        <li>Four-season adventure tourism hubs</li>
-                        <li>Cultural heritage trail development</li>
-                    </ul>
-                    <p><strong>ROI Objective:</strong> Leverage regional tax incentives & relieve summer overtourism.</p>
+                <div style='background:#ffffff; padding:20px; border-radius:12px; border-top:5px solid #ff7f0e; border:1px solid #cbd5e1; min-height:420px; display:flex; flex-direction:column; justify-content:space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.04);'>
+                    <div>
+                        <h4 style='color:#ff7f0e; margin-top:0;'>3. 🌿 Regional Growth & Ecotourism</h4>
+                        <p><strong>Target Regions:</strong> Epirus, Thessaly, Western Greece</p>
+                        <p><strong>Empirical Data Basis:</strong> Under 10% revenue share despite prime natural assets.</p>
+                        <p><strong>Recommended Investments:</strong></p>
+                        <ul style='padding-left: 20px;'>
+                            <li>Agri-tourism & mountain eco-lodges</li>
+                            <li>Four-season adventure tourism hubs</li>
+                            <li>Cultural heritage trail development</li>
+                        </ul>
+                    </div>
+                    <div style='background:#f1f5f9; padding:10px 14px; border-radius:8px; margin-top:10px;'>
+                        <strong>ROI Objective:</strong> Leverage regional tax incentives & relieve summer overtourism.
+                    </div>
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -222,17 +275,21 @@ with tab_rec:
         with col_inv1:
             st.markdown(
                 """
-                <div style='background:#f8fafc; padding:18px; border-radius:12px; border-top:4px solid #005BAE; border:1px solid #e2e8f0;'>
-                    <h4 style='color:#005BAE; margin-top:0;'>1. 💎 Ποιοτικός & Πολυτελής Τουρισμός</h4>
-                    <p><strong>Περιφέρειες Στόχοι:</strong> Νότιο Αιγαίο, Κρήτη, Ιόνια Νήσοι</p>
-                    <p><strong>Βάση Δεδομένων:</strong> Συγκεντρώνουν >70% των συνολικών εσόδων με Daily Yield >110 €.</p>
-                    <p><strong>Προτεινόμενες Επενδύσεις:</strong></p>
-                    <ul>
-                        <li>Αναβάθμιση 5-άστερων Resort & Boutique ξενοδοχείων</li>
-                        <li>Μααρίνες & Υποδομές Mega-Yachting</li>
-                        <li>Κέντρα Ευεξίας (Wellness) & Υψηλής Γαστρονομίας</li>
-                    </ul>
-                    <p><strong>Στόχος ROI:</strong> Μεγιστοποίηση δαπάνης επισκεπτών υψηλού εισοδήματος.</p>
+                <div style='background:#ffffff; padding:20px; border-radius:12px; border-top:5px solid #005BAE; border:1px solid #cbd5e1; min-height:420px; display:flex; flex-direction:column; justify-content:space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.04);'>
+                    <div>
+                        <h4 style='color:#005BAE; margin-top:0;'>1. 💎 Ποιοτικός & Πολυτελής Τουρισμός</h4>
+                        <p><strong>Περιφέρειες Στόχοι:</strong> Νότιο Αιγαίο, Κρήτη, Ιόνια Νήσοι</p>
+                        <p><strong>Βάση Δεδομένων:</strong> Συγκεντρώνουν >70% των συνολικών εσόδων με Daily Yield >110 €.</p>
+                        <p><strong>Προτεινόμενες Επενδύσεις:</strong></p>
+                        <ul style='padding-left: 20px;'>
+                            <li>Αναβάθμιση 5-άστερων Resort & Boutique ξενοδοχείων</li>
+                            <li>Μααρίνες & Υποδομές Mega-Yachting</li>
+                            <li>Κέντρα Ευεξίας (Wellness) & Υψηλής Γαστρονομίας</li>
+                        </ul>
+                    </div>
+                    <div style='background:#f1f5f9; padding:10px 14px; border-radius:8px; margin-top:10px;'>
+                        <strong>Στόχος ROI:</strong> Μεγιστοποίηση δαπάνης επισκεπτών υψηλού εισοδήματος.
+                    </div>
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -241,17 +298,21 @@ with tab_rec:
         with col_inv2:
             st.markdown(
                 """
-                <div style='background:#f8fafc; padding:18px; border-radius:12px; border-top:4px solid #2ca02c; border:1px solid #e2e8f0;'>
-                    <h4 style='color:#2ca02c; margin-top:0;'>2. 🏙️ Αστικός Τουρισμός & Συνέδρια (MICE)</h4>
-                    <p><strong>Περιφέρειες Στόχοι:</strong> Αττική, Κεντρική Μακεδονία</p>
-                    <p><strong>Βάση Δεδομένων:</strong> Υψηλός όγκος (>10M αφίξεις), χαμηλότερο ALOS (~3.7 ημέρες).</p>
-                    <p><strong>Προτεινόμενες Επενδύσεις:</strong></p>
-                    <ul>
-                        <li>Διεθνή Συνεδριακά Κέντρα (MICE)</li>
-                        <li>Boutique City-Break Ξενοδοχεία 12-μηνης λειτουργίας</li>
-                        <li>Υποδομές Co-living για ψηφιακούς νομάδες</li>
-                    </ul>
-                    <p><strong>Στόχος ROI:</strong> Η αύξηση του ALOS από 3.7 σε 4.5 ημέρες προσφέρει <strong>+21% αύξηση εσόδων (+1.2 Δις €/έτος)</strong>.</p>
+                <div style='background:#ffffff; padding:20px; border-radius:12px; border-top:5px solid #2ca02c; border:1px solid #cbd5e1; min-height:420px; display:flex; flex-direction:column; justify-content:space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.04);'>
+                    <div>
+                        <h4 style='color:#2ca02c; margin-top:0;'>2. 🏙️ Αστικός Τουρισμός & Συνέδρια (MICE)</h4>
+                        <p><strong>Περιφέρειες Στόχοι:</strong> Αττική, Κεντρική Μακεδονία</p>
+                        <p><strong>Βάση Δεδομένων:</strong> Υψηλός όγκος (>10M αφίξεις), χαμηλότερο ALOS (~3.7 ημέρες).</p>
+                        <p><strong>Προτεινόμενες Επενδύσεις:</strong></p>
+                        <ul style='padding-left: 20px;'>
+                            <li>Διεθνή Συνεδριακά Κέντρα (MICE)</li>
+                            <li>Boutique City-Break Ξενοδοχεία 12-μηνης λειτουργίας</li>
+                            <li>Υποδομές Co-living για ψηφιακούς νομάδες</li>
+                        </ul>
+                    </div>
+                    <div style='background:#f1f5f9; padding:10px 14px; border-radius:8px; margin-top:10px;'>
+                        <strong>Στόχος ROI:</strong> Η αύξηση του ALOS από 3.7 σε 4.5 ημέρες προσφέρει <strong>+21% αύξηση εσόδων (+1.2 Δις €/έτος)</strong>.
+                    </div>
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -260,17 +321,21 @@ with tab_rec:
         with col_inv3:
             st.markdown(
                 """
-                <div style='background:#f8fafc; padding:18px; border-radius:12px; border-top:4px solid #ff7f0e; border:1px solid #e2e8f0;'>
-                    <h4 style='color:#ff7f0e; margin-top:0;'>3. 🌿 Περιφερειακή Διασπορά & Οικοτουρισμός</h4>
-                    <p><strong>Περιφέρειες Στόχοι:</strong> Ήπειρος, Θεσσαλία, Δυτική Ελλάδα</p>
-                    <p><strong>Βάση Δεδομένων:</strong> <10% μερίδιο εσόδων παρά το ισχυρό φυσικό/πολιτιστικό απόθεμα.</p>
-                    <p><strong>Προτεινόμενες Επενδύσεις:</strong></p>
-                    <ul>
-                        <li>Αγροτουρισμός & Οικολογικά καταλύματα</li>
-                        <li>Πάρκα ορεινού τουρισμού 4 εποχών</li>
-                        <li>Δίκτυα πολιτιστικών & γαστρονομικών διαδρομών</li>
-                    </ul>
-                    <p><strong>Στόχος ROI:</strong> Αξιοποίηση αναπτυξιακών κινήτρων & αποσυμφόρηση θερινών προορισμών.</p>
+                <div style='background:#ffffff; padding:20px; border-radius:12px; border-top:5px solid #ff7f0e; border:1px solid #cbd5e1; min-height:420px; display:flex; flex-direction:column; justify-content:space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.04);'>
+                    <div>
+                        <h4 style='color:#ff7f0e; margin-top:0;'>3. 🌿 Περιφερειακή Διασπορά & Οικοτουρισμός</h4>
+                        <p><strong>Περιφέρειες Στόχοι:</strong> Ήπειρος, Θεσσαλία, Δυτική Ελλάδα</p>
+                        <p><strong>Βάση Δεδομένων:</strong> <10% μερίδιο εσόδων παρά το ισχυρό φυσικό/πολιτιστικό απόθεμα.</p>
+                        <p><strong>Προτεινόμενες Επενδύσεις:</strong></p>
+                        <ul style='padding-left: 20px;'>
+                            <li>Αγροτουρισμός & Οικολογικά καταλύματα</li>
+                            <li>Πάρκα ορεινού τουρισμού 4 εποχών</li>
+                            <li>Δίκτυα πολιτιστικών & γαστρονομικών διαδρομών</li>
+                        </ul>
+                    </div>
+                    <div style='background:#f1f5f9; padding:10px 14px; border-radius:8px; margin-top:10px;'>
+                        <strong>Στόχος ROI:</strong> Αξιοποίηση αναπτυξιακών κινήτρων & αποσυμφόρηση θερινών προορισμών.
+                    </div>
                 </div>
                 """,
                 unsafe_allow_html=True
