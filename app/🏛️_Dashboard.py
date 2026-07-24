@@ -7,7 +7,7 @@ import os
 # Add parent directory to sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database import get_engine
-from app.components import apply_custom_css, render_sidebar, load_fallback_df, generate_pdf_report
+from app.components import apply_custom_css, render_sidebar, load_fallback_df, generate_pdf_report, export_clean_csv
 from app.translations import t
 
 st.set_page_config(
@@ -192,7 +192,7 @@ if selected_year != t("all_years", lang):
 
 with export_csv_col:
     st.markdown("<br>", unsafe_allow_html=True)
-    csv = convert_df(filtered_df)
+    csv = export_clean_csv(filtered_df, lang=lang)
     st.download_button(
         label=t("download_csv", lang),
         data=csv,

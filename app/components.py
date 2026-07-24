@@ -185,3 +185,42 @@ def generate_pdf_report(df, lang="el"):
     pdf.cell(0, 6, footer_text, ln=True, align="C")
     
     return bytes(pdf.output())
+
+def export_clean_csv(df, lang="el"):
+    """Transforms raw dataframe into a clean, localized CSV matching the dashboard table."""
+    export_df = df.copy()
+    
+    # Calculate computed indicators if present
+    if 'arrivals' in export_df.columns and 'overnights' in export_df.columns:
+        export_df['alos'] = export_df['overnights'] / export_df['arrivals']
+    if 'receipts' in export_df.columns and 'overnights' in export_df.columns:
+        export_df['daily_yield'] = export_df['receipts'] / export_df['overnights']
+        
+    # Drop technical internal columns
+    drop_cols = ["id", "geo", "is_el_regional_unit", "country_code", "country_name", "nuts_level"]
+    if "occupancy" in export_df.columns and export_df["occupancy"].sum() == 0:
+        drop_cols.append("occupancy")
+    export_df = export_df.drop(columns=drop_cols, errors="ignore")
+    
+    # Rename headers to match localized column names
+    rename_map = {
+        "geo_label": t("col_geo_label", lang),
+        "year": t("col_year", lang),
+        "arrivals": t("col_arrivals", lang),
+        "overnights": t("col_overnights", lang),
+        "receipts": t("col_receipts", lang),
+        "turnover": t("col_turnover", lang),
+        "alos": t("col_alos", lang),
+        "daily_yield": t("col_yield", lang)
+    }
+    export_df = export_df.rename(columns=rename_map)
+    
+    # Format decimals for clean Excel readability
+    alos_header = t("col_alos", lang)
+    yield_header = t("col_yield", lang)
+    if alos_header in export_df.columns:
+        export_df[alos_header] = export_df[alos_header].round(2)
+    if yield_header in export_df.columns:
+        export_df[yield_header] = export_df[yield_header].round(2)
+        
+    return export_df.to_csv(index=False, sep=';', decimal=',').encode('utf-8-sig')

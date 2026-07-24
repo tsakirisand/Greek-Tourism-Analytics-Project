@@ -8,7 +8,7 @@ import requests
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from database import get_engine
-from app.components import apply_custom_css, render_sidebar, load_fallback_df
+from app.components import apply_custom_css, render_sidebar, load_fallback_df, export_clean_csv
 from app.translations import t
 
 st.set_page_config(page_title="Regional Analysis", page_icon="🗺️", layout="wide")
@@ -71,7 +71,7 @@ region_data['daily_yield'] = region_data['receipts'] / region_data['overnights']
 
 with col_export:
     st.markdown("<br>", unsafe_allow_html=True)
-    csv = region_data.to_csv(index=False, sep=';', decimal=',').encode('utf-8-sig')
+    csv = export_clean_csv(region_data, lang=lang)
     st.download_button(
         label=t("download_csv", lang),
         data=csv,
