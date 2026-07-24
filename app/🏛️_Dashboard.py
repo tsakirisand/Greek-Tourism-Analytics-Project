@@ -4,7 +4,7 @@ from sqlalchemy import text
 import sys
 import os
 
-# Add the parent directory to sys.path so we can import from database
+# Add parent directory to sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database import get_engine
 from app.components import apply_custom_css, render_sidebar, load_fallback_df, generate_pdf_report
@@ -104,7 +104,7 @@ top_arrivals_val = df.groupby("geo_label")["arrivals"].sum().max() if "arrivals"
 
 h_col1, h_col2 = st.columns(2)
 with h_col1:
-    st.success(t("top_revenue_region", lang, region=top_receipts_reg, value=format_number(top_receipts_val), pct=top_receipts_pct))
+    st.success(t("top_revenue_region", lang, region=top_receipts_reg, value=format_number(top_receipts_val), pct=f"{top_receipts_pct:.1f}"))
 with h_col2:
     st.info(t("top_arrivals_region", lang, region=top_arrivals_reg, value=format_number(top_arrivals_val)))
 
@@ -133,28 +133,28 @@ disp_ratio = (max_spend_reg_val / min_spend_reg_val) if min_spend_reg_val > 0 el
 # --- EXECUTIVE DATA STORYTELLING & INSIGHTS ---
 st.markdown(f"### {t('insights_summary_title', lang)}")
 
-ins1_body = t("insight_1_body", lang, min_val=format_number(min_year_val), max_val=format_number(max_year_val), multiplier=rec_multiplier)
-ins2_body = t("insight_2_body", lang, total_regions=total_reg_count, top_regions_str=top3_regions_str, top3_pct=top3_pct_val, top3_val=format_number(top3_sum), rest_pct=rest_pct_val)
-ins3_body = t("insight_3_body", lang, avg_spend=avg_spend_per_tourist, max_spend_region=max_spend_reg_name, max_spend_val=max_spend_reg_val, disparity_ratio=disp_ratio, min_spend_region=min_spend_reg_name, min_spend_val=min_spend_reg_val)
+ins1_body = t("insight_1_body", lang, min_val=format_number(min_year_val), max_val=format_number(max_year_val), multiplier=f"{rec_multiplier:.1f}")
+ins2_body = t("insight_2_body", lang, total_regions=total_reg_count, top_regions_str=top3_regions_str, top3_pct=f"{top3_pct_val:.1f}", top3_val=format_number(top3_sum), rest_pct=f"{rest_pct_val:.1f}")
+ins3_body = t("insight_3_body", lang, avg_spend=f"{avg_spend_per_tourist:.0f}", max_spend_region=max_spend_reg_name, max_spend_val=f"{max_spend_reg_val:.0f}", disparity_ratio=f"{disp_ratio:.1f}", min_spend_region=min_spend_reg_name, min_spend_val=f"{min_spend_reg_val:.0f}")
 
 st.markdown(
     f"""
     <div style='background:#ffffff; padding:22px 28px; border-radius:14px; border:1px solid #e2e8f0; box-shadow:0 4px 12px rgba(0,0,0,0.03); margin-bottom:24px;'>
         <div style='margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #f1f5f9;'>
-            <h4 style='color:#005BAE; margin:0 0 6px 0; font-size:1.15rem;'>{t('insight_1_title', lang)}</h4>
-            <p style='color:#475569; font-size:0.95rem; margin:0; line-height:1.5;'>
+            <h4 style='color:#005BAE; margin:0 0 6px 0; font-size:1.1rem;'>{t('insight_1_title', lang)}</h4>
+            <p style='color:#334155; font-size:0.95rem; margin:0; line-height:1.6;'>
                 {ins1_body}
             </p>
         </div>
         <div style='margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #f1f5f9;'>
-            <h4 style='color:#2ca02c; margin:0 0 6px 0; font-size:1.15rem;'>{t('insight_2_title', lang)}</h4>
-            <p style='color:#475569; font-size:0.95rem; margin:0; line-height:1.5;'>
+            <h4 style='color:#16a34a; margin:0 0 6px 0; font-size:1.1rem;'>{t('insight_2_title', lang)}</h4>
+            <p style='color:#334155; font-size:0.95rem; margin:0; line-height:1.6;'>
                 {ins2_body}
             </p>
         </div>
         <div>
-            <h4 style='color:#ff7f0e; margin:0 0 6px 0; font-size:1.15rem;'>{t('insight_3_title', lang)}</h4>
-            <p style='color:#475569; font-size:0.95rem; margin:0; line-height:1.5;'>
+            <h4 style='color:#ea580c; margin:0 0 6px 0; font-size:1.1rem;'>{t('insight_3_title', lang)}</h4>
+            <p style='color:#334155; font-size:0.95rem; margin:0; line-height:1.6;'>
                 {ins3_body}
             </p>
         </div>
