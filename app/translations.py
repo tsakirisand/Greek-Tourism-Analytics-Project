@@ -37,14 +37,14 @@ TRANSLATIONS = {
         "top_revenue_region": "🥇 **Πρωταθλήτρια Περιφέρεια (Έσοδα):** **{region}** με **{value} €** (καλύπτει το **{pct:.1f}%** των συνολικών εσόδων της χώρας).",
         "top_arrivals_region": "🚀 **Πρώτη Περιφέρεια σε Αφίξεις:** **{region}** με **{value}** συνολικούς επισκέπτες.",
 
-        # Storytelling Insights Box
+        # Storytelling Insights Box (Dynamically Computed Metrics)
         "insights_summary_title": "🧠 Σημαντικά Ευρήματα & Αναλυτικά Συμπεράσματα",
         "insight_1_title": "📉 1. Ανάκαμψη COVID-19 (V-Shape Recovery)",
-        "insight_1_body": "Τα έσοδα υπέστησαν κάθετη πτώση (-70%) το 2020 λόγω πανδημίας (5.07B €), αλλά η αγορά επέδειξε ταχύτατη ανάκαμψη φτάνοντας σε <strong>ιστορικά ρεκόρ όλων των εποχών το 2023-2024 (25.34B €)</strong>.",
-        "insight_2_title": "⚖️ 2. Υψηλή Γεωγραφική Συγκέντρωση",
-        "insight_2_body": "Μόλις <strong>3 από τις 13 Περιφέρειες</strong> (<em>Νότιο Αιγαίο, Αττική, Κρήτη</em>) συγκεντρώνουν πάνω από το <strong>70% του συνολικού τουριστικού πλούτου</strong> της χώρας.",
-        "insight_3_title": "💶 3. Ποιοτική Δαπάνη ανά Επισκέπτη",
-        "insight_3_body": "Η μέση δαπάνη ανά τουρίστη ανέρχεται στα <strong>~680 €</strong>. Περιφέρειες όπως το <em>Νότιο Αιγαίο</em> προσελκύουν τουρίστες υψηλής δαπάνης (~1.100 €/αφιξη), ενώ η <em>Στερεά Ελλάδα</em> καταγράφει χαμηλότερη δαπάνη (~300 €).",
+        "insight_1_body": "Τα έσοδα υπέστησαν κάθετη πτώση το 2020 λόγω πανδημίας ({min_val} €), αλλά η αγορά επέδειξε ταχύτατη ανάκαμψη πολλαπλασιάζοντας τα έσοδα κατά <strong>{multiplier:.1f}x</strong> και φτάνοντας σε <strong>ιστορικά ρεκόρ το 2023-2024 ({max_val} €)</strong>.",
+        "insight_2_title": "⚖️ 2. Υψηλή Γεωγραφική Συγκέντρωση (Pareto Distribution)",
+        "insight_2_body": "Μόλις <strong>3 από τις {total_regions} Περιφέρειες</strong> (<em>{top_regions_str}</em>) συγκεντρώνουν το <strong>{top3_pct:.1f}% του συνολικού τουριστικού εισοδήματος</strong> ({top3_val} €), ενώ οι υπόλοιπες 10 περιφέρειες μοιράζονται μόλις το {rest_pct:.1f}%.",
+        "insight_3_title": "💶 3. Ποιοτική Δαπάνη & Ανισότητα Απόδοσης",
+        "insight_3_body": "Η μέση εθνική δαπάνη ανά τουρίστη ανέρχεται στα <strong>{avg_spend:.0f} €</strong>. Η περιφέρεια <em>{max_spend_region}</em> ηγείται με <strong>{max_spend_val:.0f} €/επισκέπτη</strong>, καταγράφοντας <strong>{disparity_ratio:.1f}x υψηλότερη δαπάνη</strong> σε σύγκριση με την περιφέρεια <em>{min_spend_region}</em> ({min_spend_val:.0f} €/επισκέπτη).",
 
         # Filters & Exports
         "data_explore_title": "Εξερεύνηση Δεδομένων",
@@ -145,14 +145,14 @@ TRANSLATIONS = {
         "top_revenue_region": "🥇 **Top Revenue Region:** **{region}** with **EUR {value}** (accounting for **{pct:.1f}%** of national tourism receipts).",
         "top_arrivals_region": "🚀 **Top Region by Arrivals:** **{region}** with **{value}** total visitors.",
 
-        # Storytelling Insights Box
+        # Storytelling Insights Box (Dynamically Computed Metrics)
         "insights_summary_title": "🧠 Strategic Takeaways & Analytics Storytelling",
         "insight_1_title": "📉 1. COVID-19 V-Shaped Recovery",
-        "insight_1_body": "Revenue experienced a severe drop (-70%) in 2020 due to pandemic travel restrictions (€5.07B), but demonstrated rapid recovery reaching <strong>all-time record highs in 2023-2024 (€25.34B)</strong>.",
-        "insight_2_title": "⚖️ 2. High Regional Concentration",
-        "insight_2_body": "Only <strong>3 out of 13 regions</strong> (<em>South Aegean, Attica, Crete</em>) command over <strong>70% of total national tourism revenue</strong>.",
-        "insight_3_title": "💶 3. Tourist Spending Efficiency",
-        "insight_3_body": "Average spend per visitor stands at <strong>~€680</strong>. Regions like <em>South Aegean</em> attract high-yield tourists (~€1,100/visitor), whereas <em>Central Greece</em> averages ~€300.",
+        "insight_1_body": "Revenue experienced a severe shock in 2020 due to pandemic bans (€{min_val}), but demonstrated a **{multiplier:.1f}x recovery multiplier** to reach **all-time record highs in 2023-2024 (€{max_val})**.",
+        "insight_2_title": "⚖️ 2. High Regional Concentration (Pareto Distribution)",
+        "insight_2_body": "Only **3 out of {total_regions} Regions** (<em>{top_regions_str}</em>) command **{top3_pct:.1f}% of total national revenue** (€{top3_val}), leaving the remaining 10 regions to share just {rest_pct:.1f}%.",
+        "insight_3_title": "💶 3. Tourist Spending Efficiency & Yield Disparity",
+        "insight_3_body": "Average national spend per visitor stands at **€{avg_spend:.0f}**. **{max_spend_region}** leads with **€{max_spend_val:.0f}/visitor**, recording a **{disparity_ratio:.1f}x higher spending yield** compared to **{min_spend_region}** (€{min_spend_val:.0f}/visitor).",
 
         # Filters & Exports
         "data_explore_title": "Data Exploration",

@@ -108,8 +108,34 @@ with h_col1:
 with h_col2:
     st.info(t("top_arrivals_region", lang, region=top_arrivals_reg, value=format_number(top_arrivals_val)))
 
+# --- DYNAMIC ANALYTICS CALCULATIONS ---
+yearly_rec = df.groupby("year")["receipts"].sum()
+min_year_val = yearly_rec.min() if not yearly_rec.empty else 0
+max_year_val = yearly_rec.max() if not yearly_rec.empty else 0
+rec_multiplier = (max_year_val / min_year_val) if min_year_val > 0 else 1.0
+
+reg_rec = df.groupby("geo_label")["receipts"].sum().sort_values(ascending=False)
+total_reg_count = len(reg_rec)
+top3_regions_list = reg_rec.head(3).index.tolist()
+top3_regions_str = ", ".join(top3_regions_list)
+top3_sum = reg_rec.head(3).sum()
+total_rec_sum = reg_rec.sum()
+top3_pct_val = (top3_sum / total_rec_sum * 100) if total_rec_sum > 0 else 0
+rest_pct_val = 100.0 - top3_pct_val
+
+reg_spend = df.groupby("geo_label").apply(lambda g: g["receipts"].sum() / g["arrivals"].sum() if g["arrivals"].sum() > 0 else 0).sort_values(ascending=False)
+max_spend_reg_name = reg_spend.index[0] if not reg_spend.empty else "N/A"
+max_spend_reg_val = reg_spend.iloc[0] if not reg_spend.empty else 0
+min_spend_reg_name = reg_spend.index[-1] if not reg_spend.empty else "N/A"
+min_spend_reg_val = reg_spend.iloc[-1] if not reg_spend.empty else 1.0
+disp_ratio = (max_spend_reg_val / min_spend_reg_val) if min_spend_reg_val > 0 else 1.0
+
 # --- EXECUTIVE DATA STORYTELLING & INSIGHTS ---
 st.markdown(f"### {t('insights_summary_title', lang)}")
+
+ins1_body = t("insight_1_body", lang, min_val=format_number(min_year_val), max_val=format_number(max_year_val), multiplier=rec_multiplier)
+ins2_body = t("insight_2_body", lang, total_regions=total_reg_count, top_regions_str=top3_regions_str, top3_pct=top3_pct_val, top3_val=format_number(top3_sum), rest_pct=rest_pct_val)
+ins3_body = t("insight_3_body", lang, avg_spend=avg_spend_per_tourist, max_spend_region=max_spend_reg_name, max_spend_val=max_spend_reg_val, disparity_ratio=disp_ratio, min_spend_region=min_spend_reg_name, min_spend_val=min_spend_reg_val)
 
 st.markdown(
     f"""
@@ -117,19 +143,19 @@ st.markdown(
         <div style='margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #f1f5f9;'>
             <h4 style='color:#005BAE; margin:0 0 6px 0; font-size:1.15rem;'>{t('insight_1_title', lang)}</h4>
             <p style='color:#475569; font-size:0.95rem; margin:0; line-height:1.5;'>
-                {t('insight_1_body', lang)}
+                {ins1_body}
             </p>
         </div>
         <div style='margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #f1f5f9;'>
             <h4 style='color:#2ca02c; margin:0 0 6px 0; font-size:1.15rem;'>{t('insight_2_title', lang)}</h4>
             <p style='color:#475569; font-size:0.95rem; margin:0; line-height:1.5;'>
-                {t('insight_2_body', lang)}
+                {ins2_body}
             </p>
         </div>
         <div>
             <h4 style='color:#ff7f0e; margin:0 0 6px 0; font-size:1.15rem;'>{t('insight_3_title', lang)}</h4>
             <p style='color:#475569; font-size:0.95rem; margin:0; line-height:1.5;'>
-                {t('insight_3_body', lang)}
+                {ins3_body}
             </p>
         </div>
     </div>
