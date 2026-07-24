@@ -11,13 +11,13 @@ An enterprise-grade data analytics and visualization application for Greek touri
 
 ## 🌟 Key Features
 
-* **📊 Executive Dashboard (KPIs):** Macroeconomic overview tracking Arrivals, Overnights, Receipts, and Spend per Tourist (€) with custom interactive metric cards.
-* **🧠 Data Storytelling & Automated Insights:** Automated domain analysis quantifying COVID-19 V-shaped recovery, 70%+ regional revenue concentration, and tourist spending efficiency.
-* **💡 Standalone Insights Page (`3_💡_Insights.py`):** Dedicated page featuring in-depth analysis on pandemic shock, regional economic disparities, tourist spending rankings, and executive action plans.
+* **📊 Executive Dashboard (KPIs):** Macroeconomic overview tracking Arrivals, Overnights, Receipts, Spend per Tourist (€), **Average Length of Stay (ALOS - Days/Visitor)**, and **Daily Yield (€/Night)** with custom interactive metric cards.
+* **🧠 Data Storytelling & Automated Insights:** Automated domain analysis quantifying COVID-19 V-shaped recovery, 70%+ regional revenue concentration, tourist spending efficiency, and ALOS/Yield scatter matrices.
+* **💡 Standalone Insights Page (`3_💡_Insights.py`):** Dedicated page featuring in-depth analysis on pandemic shock, regional economic disparities, tourist spending rankings, ALOS/Yield dynamics, and executive action plans.
 * **🌐 Multi-Source Data Architecture:** Data pipeline integrating Skillscapes API (raw metrics) and Eurostat Open Data API (NUTS 2 GeoJSON boundaries).
-* **📈 Chronological Trends:** Interactive multi-year trend charts powered by Plotly with automated trend explanations.
-* **🗺️ Interactive Map & Regional Comparison:** GeoJSON-powered Choropleth map covering all 13 Greek NUTS 2 regions with dedicated tabs for Arrivals, Overnights, Receipts, and **Side-by-Side Regional Comparisons**.
-* **📄 Executive PDF & CSV Export:** Download auto-generated executive PDF summary reports and Excel-optimized CSV datasets (`UTF-8-SIG` encoding with `;` delimiter).
+* **📈 Chronological Trends:** Interactive multi-year trend charts powered by Plotly tracking Arrivals, Receipts, ALOS, and Daily Yield with automated trend explanations.
+* **🗺️ Interactive Map & Regional Comparison:** GeoJSON-powered Choropleth map covering all 13 Greek NUTS 2 regions with dedicated tabs for Arrivals, Overnights, Receipts, ALOS, Daily Yield, and **Side-by-Side Regional Comparisons**.
+* **📄 Executive PDF & CSV Export:** Download auto-generated executive PDF summary reports (including ALOS & Yield metrics) and Excel-optimized CSV datasets (`UTF-8-SIG` encoding with `;` delimiter).
 * **🐳 Production Ready (Docker):** Full Docker and Docker Compose setup for seamless containerized deployment.
 
 ---

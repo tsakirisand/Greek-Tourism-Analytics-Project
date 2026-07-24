@@ -9,12 +9,17 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from database import get_engine
 from app.components import apply_custom_css, render_sidebar, load_fallback_df
+from app.translations import t
 
-st.set_page_config(page_title="Data Insights", page_icon="💡", layout="wide")
+st.set_page_config(page_title="Strategic Insights", page_icon="💡", layout="wide")
 apply_custom_css()
 
-st.title("💡 Στρατηγική Ανάλυση & Data Insights")
-st.markdown("Επιχειρησιακά συμπεράσματα, τάσεις και στρατηγικές προτάσεις βασισμένες στα δεδομένα (Data-Driven Intelligence).")
+# Render Sidebar with Language Toggle
+render_sidebar()
+lang = st.session_state.get("lang", "el")
+
+st.title(t("insights_page_title", lang))
+st.markdown(t("insights_page_subtitle", lang))
 
 @st.cache_data(ttl=3600)
 def load_data() -> pd.DataFrame:
@@ -38,29 +43,23 @@ def load_data() -> pd.DataFrame:
 df = load_data()
 
 if df.empty:
-    st.warning("Δεν βρέθηκαν δεδομένα.")
+    st.warning("No data found.")
     st.stop()
-
-# --- SIDEBAR ---
-render_sidebar()
 
 # Filter df by NUTS length (Lock to NUTS 2)
 df = df[df['geo'].str.len() == 4]
 
 # Main Insights Tabs
-tab_covid, tab_conc, tab_spend, tab_rec = st.tabs([
-    "📉 Ανάκαμψη COVID-19", 
-    "⚖️ Γεωγραφική Συγκέντρωση", 
-    "💶 Ποιοτική Δαπάνη / Τουρίστη", 
-    "📜 Στρατηγικές Προτάσεις"
+tab_covid, tab_conc, tab_spend, tab_alos_yield, tab_rec = st.tabs([
+    t("tab_covid", lang), 
+    t("tab_conc", lang), 
+    t("tab_spend", lang), 
+    t("tab_alos_yield", lang),
+    t("tab_rec", lang)
 ])
 
 with tab_covid:
-    st.subheader("📉 Η Κατάρρευση του COVID-19 & η Ταχύτατη Ανάκαμψη (V-Shape Recovery)")
-    st.markdown(
-        "Η πανδημία του 2020 προκάλεσε την πιο βίαιη προσαρμογή στην ιστορία του ελληνικού τουρισμού. "
-        "Ωστόσο, η αγορά επέδειξε πρωτοφανή ανθεκτικότητα."
-    )
+    st.subheader(t("insight_1_title", lang))
     
     yearly = df.groupby("year")[["arrivals", "receipts"]].sum().reset_index()
     yearly["receipts_billion"] = yearly["receipts"] / 1_000_000_000
@@ -68,43 +67,31 @@ with tab_covid:
     
     fig_rec = px.bar(
         yearly, x="year", y="receipts_billion",
-        title="Εξέλιξη Συνολικών Εσόδων (Δισεκατομμύρια €)",
-        labels={"year": "Έτος", "receipts_billion": "Έσοδα (€ Δις)"},
+        title=t("chart_receipts_title", lang),
+        labels={"year": t("col_year", lang), "receipts_billion": "EUR (€ Billions)"},
         color="receipts_billion",
         color_continuous_scale="Viridis"
     )
     st.plotly_chart(fig_rec, use_container_width=True)
-    
-    st.info(
-        "💡 **Data Takeaway:** Από τα **20.27 Δις €** το 2019, τα έσοδα υποχώρησαν στα **5.07 Δις €** το 2020 (-75%). "
-        "Μέχρι το 2024, τα έσοδα εκτοξεύθηκαν στα **25.34 Δις €**, ξεπερνώντας τα προ-πανδημικά επίπεδα κατά **25%**!"
-    )
+    st.info(t("insight_1_body", lang))
 
 with tab_conc:
-    st.subheader("⚖️ Υψηλή Γεωγραφική Συγκέντρωση Τουριστικού Πλούτου")
-    st.markdown("Ανάλυση της κατανομής των τουριστικών εσόδων στις 13 Περιφέρειες της Ελλάδας.")
+    st.subheader(t("insight_2_title", lang))
     
     reg_summary = df.groupby("geo_label")["receipts"].sum().reset_index().sort_values("receipts", ascending=False)
     reg_summary["share_pct"] = (reg_summary["receipts"] / reg_summary["receipts"].sum()) * 100
-    
     top3_share = reg_summary.head(3)["share_pct"].sum()
     
     fig_pie = px.pie(
         reg_summary, values="receipts", names="geo_label",
-        title="Μερίδιο Εσόδων ανά Περιφέρεια (2019-2024)",
+        title=t("tab_conc", lang),
         hole=0.4
     )
     st.plotly_chart(fig_pie, use_container_width=True)
-    
-    st.warning(
-        f"⚠️ **Data Takeaway:** Μόλις **3 Περιφέρειες** (*Νότιο Αιγαίο*, *Αττική*, *Κρήτη*) "
-        f"συγκεντρώνουν το **{top3_share:.1f}%** του συνολικού τουριστικού εισοδήματος της Ελλάδας, "
-        "αναδεικνύοντας έντονο πρόβλημα γεωγραφικής ανισότητας."
-    )
+    st.warning(t("insight_2_body", lang))
 
 with tab_spend:
-    st.subheader("💶 Ποιοτικός Τουρισμός: Μέση Δαπάνη ανά Επισκέπτη (€)")
-    st.markdown("Αξιολόγηση των Περιφερειών με βάση την οικονομική απόδοση κάθε τουρίστα.")
+    st.subheader(t("insight_3_title", lang))
     
     spend_df = df.groupby("geo_label")[["arrivals", "receipts"]].sum().reset_index()
     spend_df["spend_per_tourist"] = spend_df["receipts"] / spend_df["arrivals"]
@@ -112,32 +99,57 @@ with tab_spend:
     
     fig_spend = px.bar(
         spend_df, x="spend_per_tourist", y="geo_label", orientation="h",
-        title="Μέση Δαπάνη ανά Επισκέπτη ανά Περιφέρεια (€/Αφιξη)",
-        labels={"spend_per_tourist": "Δαπάνη (€/τουρίστη)", "geo_label": "Περιφέρεια"},
+        title=t("kpi_spend", lang),
+        labels={"spend_per_tourist": t("kpi_spend", lang), "geo_label": t("col_geo_label", lang)},
         color="spend_per_tourist",
         color_continuous_scale="Magma"
     )
     fig_spend.update_layout(yaxis={'categoryorder':'total ascending'}, height=500)
     st.plotly_chart(fig_spend, use_container_width=True)
+    st.success(t("insight_3_body", lang))
+
+with tab_alos_yield:
+    st.subheader(t("tab_alos_yield", lang))
     
-    st.success(
-        "💡 **Data Takeaway:** Το *Νότιο Αιγαίο* ηγείται στην ποιοτική δαπάνη (~1.100 € ανά τουρίστη), "
-        "ενώ η *Στερεά Ελλάδα* και η *Δυτική Ελλάδα* καταγράφουν χαμηλότερη δαπάνη (~300 €), "
-        "υποδεικνύοντας ευκαιρίες ανάπτυξης τουρισμού υψηλής προστιθέμενης αξίας."
+    ay_df = df.groupby("geo_label")[["arrivals", "overnights", "receipts"]].sum().reset_index()
+    ay_df["alos"] = ay_df["overnights"] / ay_df["arrivals"]
+    ay_df["daily_yield"] = ay_df["receipts"] / ay_df["overnights"]
+    
+    fig_scatter = px.scatter(
+        ay_df, x="alos", y="daily_yield", size="receipts", color="geo_label",
+        hover_name="geo_label",
+        title=f"ALOS vs Daily Yield",
+        labels={"alos": t("col_alos", lang), "daily_yield": t("col_yield", lang), "geo_label": t("col_geo_label", lang)},
+        size_max=40
     )
+    st.plotly_chart(fig_scatter, use_container_width=True)
 
 with tab_rec:
-    st.subheader("📜 Στρατηγικές Προτάσεις Πολιτικής (Executive Action Plan)")
+    st.subheader(t("tab_rec", lang))
     
-    st.markdown("""
-    Βάσει των ευρημάτων της ανάλυσης δεδομένων (2019-2024), προτείνονται 3 κεντρικοί στρατηγικοί πυλώνες:
-    
-    1. 🎯 **Περιφερειακή Διασπορά (Diversification):**
-       - Παροχή κινήτρων για τουριστικές επενδύσεις σε περιφέρειες με χαμηλό μερίδιο (π.χ. Ηπειρος, Θεσσαλία, Δυτική Ελλάδα).
-    
-    2. 💎 **Ενίσχυση Ποιοτικού Τουρισμού (High-Value Tourism):**
-       - Μετάβαση από τη μέτρηση 'αριθμού αφίξεων' στη μέτρηση 'συνολικής δαπάνης ανά επισκέπτη'.
-    
-    3. 📅 **Επιμήκυνση Τουριστικής Περιόδου (Seasonality Extension):**
-       - Ανάπτυξη θεματικών μορφών τουρισμού (πολιτιστικός, γαστρονομικός, συνεδριακός) για τους μήνες εκτός αιχμής.
-    """)
+    if lang == "en":
+        st.markdown("""
+        Based on data findings (2019-2024), 3 central strategic pillars are recommended:
+        
+        1. 🎯 **Regional Diversification:**
+           - Incentivize tourism investments in lower-share regions (e.g. Epirus, Thessaly, Western Greece).
+        
+        2. 💎 **Focus on High-Value Tourism:**
+           - Transition from counting total volume of arrivals to maximizing total yield per visitor.
+        
+        3. 📅 **Seasonality Extension:**
+           - Develop thematic tourism (cultural, culinary, conference) for off-peak months.
+        """)
+    else:
+        st.markdown("""
+        Βάσει των ευρημάτων της ανάλυσης δεδομένων (2019-2024), προτείνονται 3 κεντρικοί στρατηγικοί πυλώνες:
+        
+        1. 🎯 **Περιφερειακή Διασπορά (Diversification):**
+           - Παροχή κινήτρων για τουριστικές επενδύσεις σε περιφέρειες με χαμηλό μερίδιο (π.χ. Ηπειρος, Θεσσαλία, Δυτική Ελλάδα).
+        
+        2. 💎 **Ενίσχυση Ποιοτικού Τουρισμού (High-Value Tourism):**
+           - Μετάβαση από τη μέτρηση 'αριθμού αφίξεων' στη μέτρηση 'συνολικής δαπάνης ανά επισκέπτη'.
+        
+        3. 📅 **Επιμήκυνση Τουριστικής Περιόδου (Seasonality Extension):**
+           - Ανάπτυξη θεματικών μορφών τουρισμού (πολιτιστικός, γαστρονομικός, συνεδριακός) για τους μήνες εκτός αιχμής.
+        """)

@@ -8,12 +8,17 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from database import get_engine
 from app.components import apply_custom_css, render_sidebar, load_fallback_df
+from app.translations import t
 
-st.set_page_config(page_title="Ανάλυση Τάσεων", page_icon="📈", layout="wide")
+st.set_page_config(page_title="Trends Analysis", page_icon="📈", layout="wide")
 apply_custom_css()
 
-st.title("📈 Χρονολογική Ανάλυση (Trends)")
-st.markdown("Ανάλυση της εξέλιξης του τουρισμού στην Ελλάδα μέσα στο χρόνο.")
+# Render Sidebar with Language Toggle
+render_sidebar()
+lang = st.session_state.get("lang", "el")
+
+st.title(t("trends_title", lang))
+st.markdown(t("trends_subtitle", lang))
 
 @st.cache_data(ttl=3600)
 def load_data() -> pd.DataFrame:
@@ -37,11 +42,8 @@ def load_data() -> pd.DataFrame:
 df = load_data()
 
 if df.empty:
-    st.warning("Δεν βρέθηκαν δεδομένα.")
+    st.warning("No data found.")
     st.stop()
-
-# --- SIDEBAR FILTERS ---
-render_sidebar()
 
 # Filter df by NUTS length (Lock to NUTS 2)
 df = df[df['geo'].str.len() == 4]
@@ -49,69 +51,81 @@ df = df[df['geo'].str.len() == 4]
 # Aggregate data by year
 yearly_data = df.groupby('year')[['arrivals', 'overnights', 'receipts', 'occupancy']].sum().reset_index()
 
+# Compute Industry Advanced KPIs
+yearly_data['alos'] = yearly_data['overnights'] / yearly_data['arrivals']
+yearly_data['daily_yield'] = yearly_data['receipts'] / yearly_data['overnights']
+
 # Note: Occupancy is an average, so we should take the mean.
 yearly_data['occupancy'] = df.groupby('year')['occupancy'].mean().values
 
 has_occupancy = yearly_data['occupancy'].sum() > 0
 
-if has_occupancy:
-    col1, col2, col3 = st.columns(3)
-else:
-    col1, col2 = st.columns(2)
+col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader("Εξέλιξη Αφίξεων")
     fig_arrivals = px.line(
         yearly_data, x="year", y="arrivals", 
         markers=True, 
-        title="Συνολικές Αφίξεις ανά Έτος",
-        labels={"year": "Έτος", "arrivals": "Αφίξεις"}
+        title=t("chart_arrivals_title", lang),
+        labels={"year": t("col_year", lang), "arrivals": t("col_arrivals", lang)}
     )
     fig_arrivals.update_traces(line_color="#005BAE", line_width=3)
     st.plotly_chart(fig_arrivals, use_container_width=True)
 
 with col2:
-    st.subheader("Εξέλιξη Εσόδων")
     fig_receipts = px.line(
         yearly_data, x="year", y="receipts", 
         markers=True, 
-        title="Συνολικά Έσοδα ανά Έτος (€)",
-        labels={"year": "Έτος", "receipts": "Έσοδα (€)"}
+        title=t("chart_receipts_title", lang),
+        labels={"year": t("col_year", lang), "receipts": t("col_receipts", lang)}
     )
     fig_receipts.update_traces(line_color="#2ca02c", line_width=3)
     st.plotly_chart(fig_receipts, use_container_width=True)
 
-if has_occupancy:
-    with col3:
-        st.subheader("Εξέλιξη Πληρότητας")
-        fig_occ = px.line(
-            yearly_data, x="year", y="occupancy", 
-            markers=True, 
-            title="Μέση Πληρότητα ανά Έτος (%)",
-            labels={"year": "Έτος", "occupancy": "Πληρότητα (%)"}
-        )
-        fig_occ.update_traces(line_color="#ff7f0e", line_width=3)
-        st.plotly_chart(fig_occ, use_container_width=True)
+col3, col4 = st.columns(2)
+
+with col3:
+    fig_alos = px.line(
+        yearly_data, x="year", y="alos",
+        markers=True,
+        title=t("chart_alos_title", lang),
+        labels={"year": t("col_year", lang), "alos": t("col_alos", lang)}
+    )
+    fig_alos.update_traces(line_color="#9467bd", line_width=3)
+    st.plotly_chart(fig_alos, use_container_width=True)
+
+with col4:
+    fig_yield = px.line(
+        yearly_data, x="year", y="daily_yield",
+        markers=True,
+        title=t("chart_yield_title", lang),
+        labels={"year": t("col_year", lang), "daily_yield": t("col_yield", lang)}
+    )
+    fig_yield.update_traces(line_color="#e377c2", line_width=3)
+    st.plotly_chart(fig_yield, use_container_width=True)
 
 st.divider()
 
-st.markdown("### 💡 Ερμηνεία Διαγραμμάτων & Τάσεων (Storytelling)")
-st.info(
-    "📊 **Βασικά Συμπεράσματα Χρονοσειράς (2019 - 2024):**\n\n"
-    "• **2019 (Βάση Αναφοράς):** Η χρονιά-σταθμός προ COVID-19 με 31.9M αφίξεις και 20.27B € έσοδα.\n"
-    "• **2020 (Κρίση Πανδημίας):** Δραματική πτώση λόγω ταξιδιωτικών περιορισμών (9.5M αφίξεις, 5.07B € έσοδα).\n"
-    "• **2021-2022 (Στάδιο Ανάκαμψης):** Σταδιακή επανεκκίνηση με διπλασιασμό των αφίξεων (29.2M το 2022) και επιστροφή των εσόδων στα προ-πανδημικά επίπεδα (20.1B €).\n"
-    "• **2023-2024 (Ιστορικό Ρεκόρ):** Πλήρης υπέρβαση όλων των προηγούμενων επιδόσεων. Το 2024 καταγράφονται **34.8M αφίξεις** και **25.34B € έσοδα**, επιβεβαιώνοντας τη μακροπρόθεσμη δυναμική του ελληνικού τουριστικού προϊόντος."
-)
+st.markdown(f"### {t('trends_storytelling_title', lang)}")
+st.info(t("trends_storytelling_body", lang))
 
 st.divider()
-st.subheader("Αναλυτικός Πίνακας Τάσεων")
+st.subheader("Data Table")
 display_data = yearly_data.drop(columns=['occupancy']) if not has_occupancy else yearly_data
 st.dataframe(
-    display_data.style.format({
-        "arrivals": "{:,.0f}",
-        "overnights": "{:,.0f}",
-        "receipts": "{:,.0f} €"
+    display_data.rename(columns={
+        "year": t("col_year", lang),
+        "arrivals": t("col_arrivals", lang),
+        "overnights": t("col_overnights", lang),
+        "receipts": t("col_receipts", lang),
+        "alos": t("col_alos", lang),
+        "daily_yield": t("col_yield", lang)
+    }).style.format({
+        t("col_arrivals", lang): "{:,.0f}",
+        t("col_overnights", lang): "{:,.0f}",
+        t("col_receipts", lang): "{:,.0f} €",
+        t("col_alos", lang): "{:.2f}",
+        t("col_yield", lang): "{:,.2f} €"
     }),
     use_container_width=True,
     hide_index=True

@@ -8,6 +8,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database import get_engine
 from app.components import apply_custom_css, render_sidebar, load_fallback_df, generate_pdf_report
+from app.translations import t
 
 st.set_page_config(
     page_title="Greek Tourism Dashboard",
@@ -18,8 +19,12 @@ st.set_page_config(
 # Apply Premium CSS
 apply_custom_css()
 
-st.title("🇬🇷 Ελληνικός Τουρισμός - Κεντρική Σελίδα")
-st.markdown("Καλώς ήρθατε στο κεντρικό ταμπλό δεδομένων για τον Τουρισμό στην Ελλάδα (2019-2024).")
+# Render Sidebar with Language Toggle
+render_sidebar()
+lang = st.session_state.get("lang", "el")
+
+st.title(t("dash_title", lang))
+st.markdown(t("dash_subtitle", lang))
 
 @st.cache_data(ttl=3600)
 def load_data() -> pd.DataFrame:
@@ -40,26 +45,25 @@ def load_data() -> pd.DataFrame:
         
     return load_fallback_df()
 
-with st.spinner("Φόρτωση δεδομένων..."):
+with st.spinner("Loading / Φόρτωση..."):
     df = load_data()
 
 if df.empty:
-    st.warning("Δεν βρέθηκαν δεδομένα. Παρακαλώ τρέξτε το ETL pipeline (`python main.py --load-data`).")
+    st.warning("No data found. Please run ETL pipeline (`python main.py --load-data`).")
     st.stop()
-
-# --- SIDEBAR FILTERS ---
-render_sidebar()
 
 # Filter df by NUTS length (Lock to NUTS 2 due to API bugs in NUTS 1/3)
 df = df[df['geo'].str.len() == 4]
 
 # Overall KPIs
-st.subheader(f"Συνολικά Στατιστικά - Περιφέρειες (NUTS 2)")
+st.subheader(t("kpi_section_title", lang))
 
 total_arrivals = df["arrivals"].sum() if "arrivals" in df.columns else 0
 total_overnights = df["overnights"].sum() if "overnights" in df.columns else 0
 total_receipts = df["receipts"].sum() if "receipts" in df.columns else 0
 avg_spend_per_tourist = total_receipts / total_arrivals if total_arrivals > 0 else 0
+alos = total_overnights / total_arrivals if total_arrivals > 0 else 0
+daily_yield = total_receipts / total_overnights if total_overnights > 0 else 0
 
 def format_number(num):
     if num >= 1_000_000_000:
@@ -71,20 +75,26 @@ def format_number(num):
     else:
         return f"{num:.0f}"
 
-col1, col2, col3, col4 = st.columns(4)
-with col1:
-    st.markdown(f'<div class="metric-card"><div class="metric-label">Συνολικές Αφίξεις</div><div class="metric-value">{format_number(total_arrivals)}</div></div>', unsafe_allow_html=True)
-with col2:
-    st.markdown(f'<div class="metric-card"><div class="metric-label">Διανυκτερεύσεις</div><div class="metric-value">{format_number(total_overnights)}</div></div>', unsafe_allow_html=True)
-with col3:
-    st.markdown(f'<div class="metric-card"><div class="metric-label">Συνολικά Έσοδα (€)</div><div class="metric-value">{format_number(total_receipts)}</div></div>', unsafe_allow_html=True)
-with col4:
-    st.markdown(f'<div class="metric-card"><div class="metric-label">Δαπάνη / Αφιξη</div><div class="metric-value">{avg_spend_per_tourist:.0f} €</div></div>', unsafe_allow_html=True)
+# 2 Rows of 3 Columns for optimal width and high visual contrast
+row1_col1, row1_col2, row1_col3 = st.columns(3)
+with row1_col1:
+    st.markdown(f'<div class="metric-card"><div class="metric-label">{t("kpi_arrivals", lang)}</div><div class="metric-value">{format_number(total_arrivals)}</div></div>', unsafe_allow_html=True)
+with row1_col2:
+    st.markdown(f'<div class="metric-card"><div class="metric-label">{t("kpi_overnights", lang)}</div><div class="metric-value">{format_number(total_overnights)}</div></div>', unsafe_allow_html=True)
+with row1_col3:
+    st.markdown(f'<div class="metric-card"><div class="metric-label">{t("kpi_receipts", lang)}</div><div class="metric-value">{format_number(total_receipts)} €</div></div>', unsafe_allow_html=True)
+
+row2_col1, row2_col2, row2_col3 = st.columns(3)
+with row2_col1:
+    st.markdown(f'<div class="metric-card"><div class="metric-label">{t("kpi_spend", lang)}</div><div class="metric-value">{avg_spend_per_tourist:.0f} €</div></div>', unsafe_allow_html=True)
+with row2_col2:
+    st.markdown(f'<div class="metric-card"><div class="metric-label">{t("kpi_alos", lang)}</div><div class="metric-value">{alos:.2f} {t("unit_days", lang)}</div></div>', unsafe_allow_html=True)
+with row2_col3:
+    st.markdown(f'<div class="metric-card"><div class="metric-label">{t("kpi_yield", lang)}</div><div class="metric-value">{daily_yield:.1f} {t("unit_night", lang)}</div></div>', unsafe_allow_html=True)
 
 # --- TOP PERFORMING REGIONS HIGHLIGHTS ---
-st.markdown("### 🏆 Κορυφαίες Περιφέρειες (Highlights)")
+st.markdown(f"### {t('highlights_title', lang)}")
 
-# Compute top region by receipts & arrivals
 top_receipts_reg = df.groupby("geo_label")["receipts"].sum().idxmax() if "receipts" in df.columns else "N/A"
 top_receipts_val = df.groupby("geo_label")["receipts"].sum().max() if "receipts" in df.columns else 0
 top_receipts_pct = (top_receipts_val / total_receipts * 100) if total_receipts > 0 else 0
@@ -94,32 +104,32 @@ top_arrivals_val = df.groupby("geo_label")["arrivals"].sum().max() if "arrivals"
 
 h_col1, h_col2 = st.columns(2)
 with h_col1:
-    st.success(f"🥇 **Πρωταθλήτρια Περιφέρεια (Έσοδα):** **{top_receipts_reg}** με **{format_number(top_receipts_val)} €** (καλύπτει το **{top_receipts_pct:.1f}%** των συνολικών εσόδων της χώρας).")
+    st.success(t("top_revenue_region", lang, region=top_receipts_reg, value=format_number(top_receipts_val), pct=top_receipts_pct))
 with h_col2:
-    st.info(f"🚀 **Πρώτη Περιφέρεια σε Αφίξεις:** **{top_arrivals_reg}** με **{format_number(top_arrivals_val)}** συνολικούς επισκέπτες.")
+    st.info(t("top_arrivals_region", lang, region=top_arrivals_reg, value=format_number(top_arrivals_val)))
 
 # --- EXECUTIVE DATA STORYTELLING & INSIGHTS ---
-st.markdown("### 🧠 Σημαντικά Ευρήματα & Αναλυτικά Συμπεράσματα")
+st.markdown(f"### {t('insights_summary_title', lang)}")
 
 st.markdown(
-    """
+    f"""
     <div style='background:#ffffff; padding:22px 28px; border-radius:14px; border:1px solid #e2e8f0; box-shadow:0 4px 12px rgba(0,0,0,0.03); margin-bottom:24px;'>
         <div style='margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #f1f5f9;'>
-            <h4 style='color:#005BAE; margin:0 0 6px 0; font-size:1.15rem;'>📉 1. Ανάκαμψη COVID-19 (V-Shape Recovery)</h4>
+            <h4 style='color:#005BAE; margin:0 0 6px 0; font-size:1.15rem;'>{t('insight_1_title', lang)}</h4>
             <p style='color:#475569; font-size:0.95rem; margin:0; line-height:1.5;'>
-                Τα έσοδα υπέστησαν κάθετη πτώση (-70%) το 2020 λόγω πανδημίας (5.07B €), αλλά η αγορά επέδειξε ταχύτατη ανάκαμψη φτάνοντας σε <strong>ιστορικά ρεκόρ όλων των εποχών το 2023-2024 (25.34B €)</strong>.
+                {t('insight_1_body', lang)}
             </p>
         </div>
         <div style='margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #f1f5f9;'>
-            <h4 style='color:#2ca02c; margin:0 0 6px 0; font-size:1.15rem;'>⚖️ 2. Υψηλή Γεωγραφική Συγκέντρωση</h4>
+            <h4 style='color:#2ca02c; margin:0 0 6px 0; font-size:1.15rem;'>{t('insight_2_title', lang)}</h4>
             <p style='color:#475569; font-size:0.95rem; margin:0; line-height:1.5;'>
-                Μόλις <strong>3 από τις 13 Περιφέρειες</strong> (<em>Νότιο Αιγαίο, Αττική, Κρήτη</em>) συγκεντρώνουν πάνω από το <strong>70% του συνολικού τουριστικού πλούτου</strong> της χώρας, αναδεικνύοντας επιτακτική ανάγκη περιφερειακής διασποράς.
+                {t('insight_2_body', lang)}
             </p>
         </div>
         <div>
-            <h4 style='color:#ff7f0e; margin:0 0 6px 0; font-size:1.15rem;'>💶 3. Ποιοτική Δαπάνη ανά Επισκέπτη</h4>
+            <h4 style='color:#ff7f0e; margin:0 0 6px 0; font-size:1.15rem;'>{t('insight_3_title', lang)}</h4>
             <p style='color:#475569; font-size:0.95rem; margin:0; line-height:1.5;'>
-                Η μέση δαπάνη ανά τουρίστη ανέρχεται στα <strong>~680 €</strong>. Περιφέρειες όπως το <em>Νότιο Αιγαίο</em> προσελκύουν τουρίστες υψηλής δαπάνης (~1.100 €/αφιξη), ενώ η <em>Στερεά Ελλάδα</em> καταγράφει χαμηλότερη δαπάνη (~300 €).
+                {t('insight_3_body', lang)}
             </p>
         </div>
     </div>
@@ -129,9 +139,7 @@ st.markdown(
 
 st.divider()
 
-st.info("👈 Χρησιμοποιήστε το μενού στα αριστερά για να περιηγηθείτε στις αναλυτικές σελίδες **Τάσεων (Trends)** και **Περιοχών (Regions)**.")
-
-st.subheader("Εξερεύνηση Δεδομένων")
+st.subheader(t("data_explore_title", lang))
 
 # CSV Export Helper
 @st.cache_data
@@ -142,25 +150,25 @@ def convert_df(df):
 filter_col1, filter_col2, export_csv_col, export_pdf_col = st.columns([2, 2, 1, 1])
 
 with filter_col1:
-    regions = ["Όλες οι Περιοχές"] + sorted(df['geo_label'].unique().tolist())
-    selected_region = st.selectbox("Επιλογή Περιοχής:", regions)
+    regions = [t("all_regions", lang)] + sorted(df['geo_label'].unique().tolist())
+    selected_region = st.selectbox(t("select_region", lang), regions)
 
 with filter_col2:
-    years = ["Όλα τα Έτη"] + sorted(df['year'].unique().tolist())
-    selected_year = st.selectbox("Επιλογή Έτους:", years)
+    years = [t("all_years", lang)] + sorted(df['year'].unique().tolist())
+    selected_year = st.selectbox(t("select_year", lang), years)
 
 # Filter the dataframe
 filtered_df = df.copy()
-if selected_region != "Όλες οι Περιοχές":
+if selected_region != t("all_regions", lang):
     filtered_df = filtered_df[filtered_df['geo_label'] == selected_region]
-if selected_year != "Όλα τα Έτη":
+if selected_year != t("all_years", lang):
     filtered_df = filtered_df[filtered_df['year'] == selected_year]
 
 with export_csv_col:
     st.markdown("<br>", unsafe_allow_html=True)
     csv = convert_df(filtered_df)
     st.download_button(
-        label="📥 CSV",
+        label=t("download_csv", lang),
         data=csv,
         file_name='tourism_data.csv',
         mime='text/csv',
@@ -169,9 +177,9 @@ with export_csv_col:
 with export_pdf_col:
     st.markdown("<br>", unsafe_allow_html=True)
     try:
-        pdf_data = generate_pdf_report(filtered_df)
+        pdf_data = generate_pdf_report(filtered_df, lang=lang)
         st.download_button(
-            label="📄 PDF Summary",
+            label=t("download_pdf", lang),
             data=pdf_data,
             file_name='tourism_summary_report.pdf',
             mime='application/pdf',
@@ -180,20 +188,35 @@ with export_pdf_col:
         print(f"PDF export error: {e}")
 
 # Display the dataframe with clean business columns
+display_df = filtered_df.copy()
+display_df['alos'] = display_df['overnights'] / display_df['arrivals']
+display_df['daily_yield'] = display_df['receipts'] / display_df['overnights']
+
 drop_cols = ["id", "geo", "is_el_regional_unit", "country_code", "country_name", "nuts_level"]
-if "occupancy" in filtered_df.columns and filtered_df["occupancy"].sum() == 0:
+if "occupancy" in display_df.columns and display_df["occupancy"].sum() == 0:
     drop_cols.append("occupancy")
 
 st.dataframe(
-    filtered_df.drop(columns=drop_cols, errors="ignore").style.format({
-        "arrivals": "{:,.0f}",
-        "overnights": "{:,.0f}",
-        "receipts": "{:,.0f} €",
-        "turnover": "{:,.0f} €"
+    display_df.drop(columns=drop_cols, errors="ignore").rename(columns={
+        "geo_label": t("col_geo_label", lang),
+        "year": t("col_year", lang),
+        "arrivals": t("col_arrivals", lang),
+        "overnights": t("col_overnights", lang),
+        "receipts": t("col_receipts", lang),
+        "turnover": t("col_turnover", lang),
+        "alos": t("col_alos", lang),
+        "daily_yield": t("col_yield", lang)
+    }).style.format({
+        t("col_arrivals", lang): "{:,.0f}",
+        t("col_overnights", lang): "{:,.0f}",
+        t("col_receipts", lang): "{:,.0f} €",
+        t("col_turnover", lang): "{:,.0f} €",
+        t("col_alos", lang): "{:.2f}",
+        t("col_yield", lang): "{:,.2f} €"
     }),
     use_container_width=True,
     hide_index=True,
     height=400
 )
 
-st.caption(f"Εμφάνιση {len(filtered_df)} εγγραφών με βάση τα φίλτρα σας.")
+st.caption(t("showing_records", lang, count=len(filtered_df)))
