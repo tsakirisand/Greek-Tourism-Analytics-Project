@@ -1,18 +1,27 @@
-import streamlit as st
-from app.translations import t
+"""
+Reusable Streamlit UI components, custom styling, sidebar management, and cache controls.
+"""
 
-def apply_custom_css():
-    """Injects premium custom CSS with high-contrast fonts, rich card designs, and micro-animations."""
-    st.markdown("""
+import os
+from typing import Any, Dict, List, Optional
+import pandas as pd
+import streamlit as st
+
+from app.translations import t
+from logger import logger
+
+
+def apply_custom_css() -> None:
+    """Injects premium custom CSS with typography, metric cards, borders, and micro-animations."""
+    st.markdown(
+        """
         <style>
-            /* Import modern font */
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
             
             html, body, [class*="css"]  {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             }
             
-            /* Metric Card Styling with Rich Borders, High Contrast & Elevation */
             .metric-card {
                 background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%);
                 padding: 18px 14px;
@@ -52,39 +61,55 @@ def apply_custom_css():
                 white-space: nowrap;
             }
             
-            /* Make dataframe headers look premium */
             thead tr th {
                 background-color: #005BAE !important;
                 color: white !important;
                 font-weight: 700 !important;
             }
         </style>
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
 
-def render_sidebar():
-    """Renders the common premium sidebar with language toggle, info, and health status."""
+
+def clear_app_cache() -> None:
+    """Invalidates Streamlit data cache and clears cached data resources."""
+    st.cache_data.clear()
+    logger.info("Streamlit data cache invalidated by user action.")
+    st.sidebar.success("Cache cleared successfully! / Η μνήμη cache εκκαθαρίστηκε!")
+
+
+def render_sidebar() -> None:
+    """Renders the standard sidebar with language selection, status indicators, and cache management."""
     st.sidebar.markdown("### 🌐 Language / Γλώσσα")
-    
+
     current_lang = st.session_state.get("lang", "el")
     default_index = 0 if current_lang == "el" else 1
-    
+
     lang_choice = st.sidebar.selectbox(
         "Select Language / Επιλογή Γλώσσας",
         ["🇬🇷 Ελληνικά", "🇬🇧 English"],
         index=default_index,
-        key="lang_selectbox"
+        key="lang_selectbox",
     )
-    
+
     new_lang = "el" if "Ελληνικά" in lang_choice else "en"
     if st.session_state.get("lang") != new_lang:
         st.session_state["lang"] = new_lang
         st.rerun()
-        
+
     lang = st.session_state.get("lang", "el")
-    
+
     st.sidebar.markdown("---")
     st.sidebar.markdown(f"### {t('sidebar_info_title', lang)}")
     st.sidebar.info(t("sidebar_info_body", lang))
+    st.sidebar.markdown("---")
+
+    # Cache Management & Refresh Action
+    st.sidebar.markdown("### ⚡ Cache Management")
+    if st.sidebar.button("🔄 Refresh Data / Εκκαθάριση Cache", key="btn_clear_cache"):
+        clear_app_cache()
+
     st.sidebar.markdown("---")
     st.sidebar.markdown(
         f"<div style='background:#f0f9ff; padding:12px; border-radius:8px; border:1px solid #bae6fd; font-size:0.85rem; color:#0369a1;'>"
@@ -92,15 +117,23 @@ def render_sidebar():
         f"<strong>{t('sidebar_pipeline', lang)}</strong><br>"
         f"<strong>{t('sidebar_scope', lang)}</strong>"
         "</div>",
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
-def load_fallback_df():
-    """Loads fallback data from local JSON file if database is unavailable."""
-    import os
-    import pandas as pd
-    json_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "raw_data.json")
+
+def load_fallback_df() -> pd.DataFrame:
+    """Loads fallback raw data from local JSON file if database connection is unavailable.
+
+    Returns:
+        pd.DataFrame: Cleaned pandas DataFrame or empty DataFrame on failure.
+    """
+    json_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "data",
+        "raw_data.json",
+    )
     if not os.path.exists(json_path):
+        logger.warning(f"Fallback dataset not found at {json_path}")
         return pd.DataFrame()
     try:
         df = pd.read_json(json_path)
@@ -108,32 +141,75 @@ def load_fallback_df():
             "hotels_total_arrivals": "arrivals",
             "hotels_total_overnights": "overnights",
             "hotels_occupancy": "occupancy",
-            "turnover_total": "turnover"
+            "turnover_total": "turnover",
         }
         df = df.rename(columns=rename_map)
-        if 'receipts' in df.columns:
-            df['receipts'] = df['receipts'] * 1_000_000
-        if 'turnover' in df.columns:
-            df['turnover'] = df['turnover'] * 1_000
+        if "receipts" in df.columns:
+            df["receipts"] = df["receipts"] * 1_000_000
+        if "turnover" in df.columns:
+            df["turnover"] = df["turnover"] * 1_000
+        logger.info(f"Loaded {len(df)} records from fallback raw_data.json")
         return df
     except Exception as e:
-        print(f"Fallback load error: {e}")
+        logger.error(f"Fallback data loading failed: {e}")
         return pd.DataFrame()
 
-def generate_pdf_report(df, lang="el"):
-    """Generates an executive PDF report bytes using FPDF."""
+
+def render_metric_card(title: str, value: str) -> None:
+    """Renders a high-contrast styled metric card.
+
+    Args:
+        title: Metric title label.
+        value: Formatted display value string.
+    """
+    st.markdown(
+        f'<div class="metric-card">'
+        f'<div class="metric-label">{title}</div>'
+        f'<div class="metric-value">{value}</div>'
+        f"</div>",
+        unsafe_allow_html=True,
+    )
+
+
+def render_error_banner(
+    message: str, details: Optional[str] = None, lang: str = "el"
+) -> None:
+    """Displays a formatted error alert card to the user in Streamlit UI.
+
+    Args:
+        message: Primary error message string.
+        details: Optional technical details string.
+        lang: Selected interface language ('el' or 'en').
+    """
+    header = "⚠️ Σφάλμα / Error" if lang == "el" else "⚠️ Error"
+    st.error(f"**{header}:** {message}")
+    if details:
+        with st.expander("Technical details / Τεχνικές λεπτομέρειες"):
+            st.code(details)
+
+
+def generate_pdf_report(df: pd.DataFrame, lang: str = "el") -> bytes:
+    """Generates an executive PDF report bytes using FPDF.
+
+    Args:
+        df: Input DataFrame containing tourism records.
+        lang: Language for PDF headers and text.
+
+    Returns:
+        bytes: Raw PDF file bytes ready for download.
+    """
     from fpdf import FPDF
-    
+
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Helvetica", "B", 18)
-    
+
     title_text = t("pdf_title", lang)
     subtitle_text = t("pdf_subtitle", lang)
     sec1_text = t("pdf_section1", lang)
     sec2_text = t("pdf_section2", lang)
     footer_text = t("pdf_footer", lang)
-    
+
     # Title
     pdf.set_text_color(0, 91, 174)
     pdf.cell(0, 10, title_text, ln=True, align="C")
@@ -141,7 +217,7 @@ def generate_pdf_report(df, lang="el"):
     pdf.set_text_color(100, 100, 100)
     pdf.cell(0, 8, subtitle_text, ln=True, align="C")
     pdf.ln(10)
-    
+
     # Key Totals
     total_arrivals = df["arrivals"].sum() if "arrivals" in df.columns else 0
     total_overnights = df["overnights"].sum() if "overnights" in df.columns else 0
@@ -149,7 +225,7 @@ def generate_pdf_report(df, lang="el"):
     avg_spend = total_receipts / total_arrivals if total_arrivals > 0 else 0
     alos = total_overnights / total_arrivals if total_arrivals > 0 else 0
     daily_yield = total_receipts / total_overnights if total_overnights > 0 else 0
-    
+
     pdf.set_font("Helvetica", "B", 12)
     pdf.set_text_color(0, 0, 0)
     pdf.cell(0, 8, sec1_text, ln=True)
@@ -159,50 +235,73 @@ def generate_pdf_report(df, lang="el"):
     pdf.cell(0, 6, f"- Total Tourism Receipts: EUR {total_receipts:,.0f}", ln=True)
     pdf.cell(0, 6, f"- Average Spend per Tourist: EUR {avg_spend:,.2f}", ln=True)
     pdf.cell(0, 6, f"- Average Length of Stay (ALOS): {alos:.2f} days/visitor", ln=True)
-    pdf.cell(0, 6, f"- Daily Yield per Overnight: EUR {daily_yield:,.2f}/night", ln=True)
+    pdf.cell(
+        0, 6, f"- Daily Yield per Overnight: EUR {daily_yield:,.2f}/night", ln=True
+    )
     pdf.ln(8)
-    
+
     # Top Regions Table
     pdf.set_font("Helvetica", "B", 12)
     pdf.cell(0, 8, sec2_text, ln=True)
-    
+
     if "geo_label" in df.columns and "receipts" in df.columns:
-        top_regions = df.groupby("geo_label")["receipts"].sum().reset_index().sort_values("receipts", ascending=False).head(5)
-        
+        top_regions = (
+            df.groupby("geo_label")["receipts"]
+            .sum()
+            .reset_index()
+            .sort_values("receipts", ascending=False)
+            .head(5)
+        )
+
         pdf.set_font("Helvetica", "B", 10)
         pdf.cell(110, 7, "Region Name", border=1)
         pdf.cell(70, 7, "Total Revenue (EUR)", border=1, ln=True)
-        
+
         pdf.set_font("Helvetica", "", 10)
         for _, row in top_regions.iterrows():
-            reg_name = str(row["geo_label"]).encode('latin-1', 'replace').decode('latin-1')
+            reg_name = (
+                str(row["geo_label"]).encode("latin-1", "replace").decode("latin-1")
+            )
             pdf.cell(110, 7, reg_name, border=1)
             pdf.cell(70, 7, f"EUR {row['receipts']:,.0f}", border=1, ln=True)
-            
+
     pdf.ln(10)
     pdf.set_font("Helvetica", "I", 8)
     pdf.set_text_color(128, 128, 128)
     pdf.cell(0, 6, footer_text, ln=True, align="C")
-    
+
     return bytes(pdf.output())
 
-def export_clean_csv(df, lang="el"):
-    """Transforms raw dataframe into a clean, localized CSV matching the dashboard table."""
+
+def export_clean_csv(df: pd.DataFrame, lang: str = "el") -> bytes:
+    """Transforms dataframe into localized CSV bytes formatted for Excel.
+
+    Args:
+        df: Raw or filtered DataFrame.
+        lang: Language for CSV column headers.
+
+    Returns:
+        bytes: Encoded CSV file content bytes.
+    """
     export_df = df.copy()
-    
-    # Calculate computed indicators if present
-    if 'arrivals' in export_df.columns and 'overnights' in export_df.columns:
-        export_df['alos'] = export_df['overnights'] / export_df['arrivals']
-    if 'receipts' in export_df.columns and 'overnights' in export_df.columns:
-        export_df['daily_yield'] = export_df['receipts'] / export_df['overnights']
-        
-    # Drop technical internal columns
-    drop_cols = ["id", "geo", "is_el_regional_unit", "country_code", "country_name", "nuts_level"]
+
+    if "arrivals" in export_df.columns and "overnights" in export_df.columns:
+        export_df["alos"] = export_df["overnights"] / export_df["arrivals"]
+    if "receipts" in export_df.columns and "overnights" in export_df.columns:
+        export_df["daily_yield"] = export_df["receipts"] / export_df["overnights"]
+
+    drop_cols = [
+        "id",
+        "geo",
+        "is_el_regional_unit",
+        "country_code",
+        "country_name",
+        "nuts_level",
+    ]
     if "occupancy" in export_df.columns and export_df["occupancy"].sum() == 0:
         drop_cols.append("occupancy")
     export_df = export_df.drop(columns=drop_cols, errors="ignore")
-    
-    # Rename headers to match localized column names
+
     rename_map = {
         "geo_label": t("col_geo_label", lang),
         "year": t("col_year", lang),
@@ -211,16 +310,15 @@ def export_clean_csv(df, lang="el"):
         "receipts": t("col_receipts", lang),
         "turnover": t("col_turnover", lang),
         "alos": t("col_alos", lang),
-        "daily_yield": t("col_yield", lang)
+        "daily_yield": t("col_yield", lang),
     }
     export_df = export_df.rename(columns=rename_map)
-    
-    # Format decimals for clean Excel readability
+
     alos_header = t("col_alos", lang)
     yield_header = t("col_yield", lang)
     if alos_header in export_df.columns:
         export_df[alos_header] = export_df[alos_header].round(2)
     if yield_header in export_df.columns:
         export_df[yield_header] = export_df[yield_header].round(2)
-        
-    return export_df.to_csv(index=False, sep=';', decimal=',').encode('utf-8-sig')
+
+    return export_df.to_csv(index=False, sep=";", decimal=",").encode("utf-8-sig")

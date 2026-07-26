@@ -17,9 +17,13 @@ __pycache__/
 # Streamlit
 .streamlit/credentials.toml
 
-# Database
+# Database & Logs
 *.sqlite3
 *.db
+app.log
+.pytest_cache/
+.coverage
+coverage.xml
 
 # Docker
 docker-compose.override.yml

@@ -1,0 +1,22 @@
+name: Deploy to Render Production
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    name: Trigger Render Deploy Hook
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Deploy Hook via Curl
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK" ]; then
+            echo "RENDER_DEPLOY_HOOK secret is not set. Please configure it in GitHub repository settings."
+            exit 0
+          fi
+          echo "Triggering Render deployment..."
+          curl -X POST "$RENDER_DEPLOY_HOOK"
+          echo "Render deployment triggered successfully!"

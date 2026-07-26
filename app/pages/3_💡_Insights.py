@@ -1,27 +1,46 @@
-import streamlit as st
+"""
+Strategic Insights Streamlit page for executive storytelling, investment analysis, and data-driven recommendations.
+"""
+
+import os
+import sys
+from typing import Any
 import pandas as pd
 import plotly.express as px
 from sqlalchemy import text
-import sys
-import os
+import streamlit as st
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from database import get_engine
-from app.components import apply_custom_css, render_sidebar, load_fallback_df
+sys.path.append(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
+
+from app.components import (
+    apply_custom_css,
+    load_fallback_df,
+    render_error_banner,
+    render_sidebar,
+)
 from app.translations import t
+from database import get_engine
+from logger import logger
 
 st.set_page_config(page_title="Strategic Insights", page_icon="💡", layout="wide")
 apply_custom_css()
-
-# Render Sidebar with Language Toggle
 render_sidebar()
-lang = st.session_state.get("lang", "el")
+
+lang: str = st.session_state.get("lang", "el")
 
 st.title(t("insights_page_title", lang))
 st.markdown(t("insights_page_subtitle", lang))
 
+
 @st.cache_data(ttl=3600)
-def load_data() -> pd.DataFrame:
+def load_insights_data() -> pd.DataFrame:
+    """Fetches tourism records from database with caching for strategic insights page.
+
+    Returns:
+        pd.DataFrame: Cleaned dataset.
+    """
     query = "SELECT * FROM tourism_data"
     try:
         engine = get_engine()
@@ -29,27 +48,29 @@ def load_data() -> pd.DataFrame:
             with engine.connect() as conn:
                 df = pd.read_sql(text(query), conn)
             if not df.empty:
-                if 'receipts' in df.columns:
-                    df['receipts'] = df['receipts'] * 1_000_000
-                if 'turnover' in df.columns:
-                    df['turnover'] = df['turnover'] * 1_000
+                if "receipts" in df.columns:
+                    df["receipts"] = df["receipts"] * 1_000_000
+                if "turnover" in df.columns:
+                    df["turnover"] = df["turnover"] * 1_000
                 return df
-    except Exception:
-        pass
-        
+    except Exception as e:
+        logger.warning(f"Database fetch warning in insights page: {e}")
+
     return load_fallback_df()
 
-df = load_data()
+
+df: pd.DataFrame = load_insights_data()
 
 if df.empty:
-    st.warning("No data found.")
+    render_error_banner(message="No data found for strategic insights.", lang=lang)
     st.stop()
 
-# Filter df by NUTS length (Lock to NUTS 2)
-df = df[df['geo'].str.len() == 4]
+# Lock to NUTS 2 regions
+df = df[df["geo"].str.len() == 4]
 
-# --- DYNAMIC ANALYTICS CALCULATIONS ---
-def format_number(num):
+
+def format_number(num: float) -> str:
+    """Formats numeric metrics into compact string representations (B, M, K)."""
     if num >= 1_000_000_000:
         return f"{num/1_000_000_000:.2f}B"
     elif num >= 1_000_000:
@@ -59,14 +80,15 @@ def format_number(num):
     else:
         return f"{num:.0f}"
 
-total_arrivals = df["arrivals"].sum() if "arrivals" in df.columns else 0
-total_overnights = df["overnights"].sum() if "overnights" in df.columns else 0
-total_receipts = df["receipts"].sum() if "receipts" in df.columns else 0
-avg_spend_per_tourist = total_receipts / total_arrivals if total_arrivals > 0 else 0
+
+total_arrivals = df["arrivals"].sum() if "arrivals" in df.columns else 0.0
+total_overnights = df["overnights"].sum() if "overnights" in df.columns else 0.0
+total_receipts = df["receipts"].sum() if "receipts" in df.columns else 0.0
+avg_spend_per_tourist = total_receipts / total_arrivals if total_arrivals > 0 else 0.0
 
 yearly_rec = df.groupby("year")["receipts"].sum()
-min_year_val = yearly_rec.min() if not yearly_rec.empty else 0
-max_year_val = yearly_rec.max() if not yearly_rec.empty else 0
+min_year_val = yearly_rec.min() if not yearly_rec.empty else 0.0
+max_year_val = yearly_rec.max() if not yearly_rec.empty else 0.0
 rec_multiplier = (max_year_val / min_year_val) if min_year_val > 0 else 1.0
 
 reg_rec = df.groupby("geo_label")["receipts"].sum().sort_values(ascending=False)
@@ -75,91 +97,142 @@ top3_regions_list = reg_rec.head(3).index.tolist()
 top3_regions_str = ", ".join(top3_regions_list)
 top3_sum = reg_rec.head(3).sum()
 total_rec_sum = reg_rec.sum()
-top3_pct_val = (top3_sum / total_rec_sum * 100) if total_rec_sum > 0 else 0
+top3_pct_val = (top3_sum / total_rec_sum * 100) if total_rec_sum > 0 else 0.0
 rest_pct_val = 100.0 - top3_pct_val
 
-reg_spend = df.groupby("geo_label").apply(lambda g: g["receipts"].sum() / g["arrivals"].sum() if g["arrivals"].sum() > 0 else 0).sort_values(ascending=False)
+reg_spend = (
+    df.groupby("geo_label")
+    .apply(
+        lambda g: (
+            g["receipts"].sum() / g["arrivals"].sum()
+            if g["arrivals"].sum() > 0
+            else 0.0
+        )
+    )
+    .sort_values(ascending=False)
+)
 max_spend_reg_name = reg_spend.index[0] if not reg_spend.empty else "N/A"
-max_spend_reg_val = reg_spend.iloc[0] if not reg_spend.empty else 0
+max_spend_reg_val = reg_spend.iloc[0] if not reg_spend.empty else 0.0
 min_spend_reg_name = reg_spend.index[-1] if not reg_spend.empty else "N/A"
 min_spend_reg_val = reg_spend.iloc[-1] if not reg_spend.empty else 1.0
 disp_ratio = (max_spend_reg_val / min_spend_reg_val) if min_spend_reg_val > 0 else 1.0
 
-ins1_body = t("insight_1_body", lang, min_val=format_number(min_year_val), max_val=format_number(max_year_val), multiplier=f"{rec_multiplier:.1f}")
-ins2_body = t("insight_2_body", lang, total_regions=total_reg_count, top_regions_str=top3_regions_str, top3_pct=f"{top3_pct_val:.1f}", top3_val=format_number(top3_sum), rest_pct=f"{rest_pct_val:.1f}")
-ins3_body = t("insight_3_body", lang, avg_spend=f"{avg_spend_per_tourist:.0f}", max_spend_region=max_spend_reg_name, max_spend_val=f"{max_spend_reg_val:.0f}", disparity_ratio=f"{disp_ratio:.1f}", min_spend_region=min_spend_reg_name, min_spend_val=f"{min_spend_reg_val:.0f}")
+ins1_body = t(
+    "insight_1_body",
+    lang,
+    min_val=format_number(min_year_val),
+    max_val=format_number(max_year_val),
+    multiplier=f"{rec_multiplier:.1f}",
+)
+ins2_body = t(
+    "insight_2_body",
+    lang,
+    total_regions=total_reg_count,
+    top_regions_str=top3_regions_str,
+    top3_pct=f"{top3_pct_val:.1f}",
+    top3_val=format_number(top3_sum),
+    rest_pct=f"{rest_pct_val:.1f}",
+)
+ins3_body = t(
+    "insight_3_body",
+    lang,
+    avg_spend=f"{avg_spend_per_tourist:.0f}",
+    max_spend_region=max_spend_reg_name,
+    max_spend_val=f"{max_spend_reg_val:.0f}",
+    disparity_ratio=f"{disp_ratio:.1f}",
+    min_spend_region=min_spend_reg_name,
+    min_spend_val=f"{min_spend_reg_val:.0f}",
+)
 
 # Main Insights Tabs
-tab_covid, tab_conc, tab_spend, tab_alos_yield, tab_rec = st.tabs([
-    t("tab_covid", lang), 
-    t("tab_conc", lang), 
-    t("tab_spend", lang), 
-    t("tab_alos_yield", lang),
-    t("tab_rec", lang)
-])
+tab_covid, tab_conc, tab_spend, tab_alos_yield, tab_rec = st.tabs(
+    [
+        t("tab_covid", lang),
+        t("tab_conc", lang),
+        t("tab_spend", lang),
+        t("tab_alos_yield", lang),
+        t("tab_rec", lang),
+    ]
+)
 
 with tab_covid:
     st.subheader(t("insight_1_title", lang))
-    
+
     yearly = df.groupby("year")[["arrivals", "receipts"]].sum().reset_index()
     yearly["receipts_billion"] = yearly["receipts"] / 1_000_000_000
     yearly["arrivals_million"] = yearly["arrivals"] / 1_000_000
-    
+
     fig_rec = px.bar(
-        yearly, x="year", y="receipts_billion",
+        yearly,
+        x="year",
+        y="receipts_billion",
         title=t("chart_receipts_title", lang),
         labels={"year": t("col_year", lang), "receipts_billion": "EUR (€ Billions)"},
         color="receipts_billion",
-        color_continuous_scale="Viridis"
+        color_continuous_scale="Viridis",
     )
     st.plotly_chart(fig_rec, use_container_width=True)
     st.info(ins1_body)
 
 with tab_conc:
     st.subheader(t("insight_2_title", lang))
-    
-    reg_summary = df.groupby("geo_label")["receipts"].sum().reset_index().sort_values("receipts", ascending=False)
-    reg_summary["share_pct"] = (reg_summary["receipts"] / reg_summary["receipts"].sum()) * 100
-    top3_share = reg_summary.head(3)["share_pct"].sum()
-    
+
+    reg_summary = (
+        df.groupby("geo_label")["receipts"]
+        .sum()
+        .reset_index()
+        .sort_values("receipts", ascending=False)
+    )
+    reg_summary["share_pct"] = (
+        reg_summary["receipts"] / reg_summary["receipts"].sum()
+    ) * 100
+
     fig_pie = px.pie(
-        reg_summary, values="receipts", names="geo_label",
+        reg_summary,
+        values="receipts",
+        names="geo_label",
         title=t("tab_conc", lang),
-        hole=0.4
+        hole=0.4,
     )
     st.plotly_chart(fig_pie, use_container_width=True)
     st.warning(ins2_body)
 
 with tab_spend:
     st.subheader(t("insight_3_title", lang))
-    
+
     spend_df = df.groupby("geo_label")[["arrivals", "receipts"]].sum().reset_index()
     spend_df["spend_per_tourist"] = spend_df["receipts"] / spend_df["arrivals"]
     spend_df = spend_df.sort_values("spend_per_tourist", ascending=False)
-    
+
     fig_spend = px.bar(
-        spend_df, x="spend_per_tourist", y="geo_label", orientation="h",
+        spend_df,
+        x="spend_per_tourist",
+        y="geo_label",
+        orientation="h",
         title=t("kpi_spend", lang),
-        labels={"spend_per_tourist": t("kpi_spend", lang), "geo_label": t("col_geo_label", lang)},
+        labels={
+            "spend_per_tourist": t("kpi_spend", lang),
+            "geo_label": t("col_geo_label", lang),
+        },
         color="spend_per_tourist",
-        color_continuous_scale="Magma"
+        color_continuous_scale="Magma",
     )
-    fig_spend.update_layout(yaxis={'categoryorder':'total ascending'}, height=500)
+    fig_spend.update_layout(yaxis={"categoryorder": "total ascending"}, height=500)
     st.plotly_chart(fig_spend, use_container_width=True)
     st.success(ins3_body)
 
 with tab_alos_yield:
     st.subheader("⏱️ Average Length of Stay (ALOS) & Daily Yield Analysis")
-    
+
     if lang == "en":
         st.markdown(
             "**What is ALOS?** Average Length of Stay = $\\text{Total Overnights} / \\text{Total Arrivals}$. "
             "It measures the average duration (in days) a visitor spends in Greece during a trip.\n\n"
             "#### 📈 Multi-Year Curve Explanation (2019-2024):\n"
             "• **2019 Baseline (3.74 Days):** Pre-pandemic equilibrium travel duration.\n"
-            "• **2020 Pandemic Shock (3.50 Days):** Dropped due to strict flight bans, quarantine rules, and emergency short-stay return trips.\n"
-            "• **2022 Post-Lockdown Peak (3.81 Days):** Surged as travelers took longer extended vacations ('revenge travel') after two years of restrictions.\n"
-            "• **2023-2024 Stabilization (3.69 Days):** Normalized to ~3.7 days as European short-haul flight frequencies and city breaks resumed."
+            "• **2020 Pandemic Shock (3.50 Days):** Dropped due to strict flight bans and emergency short-stay return trips.\n"
+            "• **2022 Post-Lockdown Peak (3.81 Days):** Surged as travelers took longer extended vacations ('revenge travel').\n"
+            "• **2023-2024 Stabilization (3.69 Days):** Normalized to ~3.7 days as city breaks resumed."
         )
     else:
         st.markdown(
@@ -167,35 +240,47 @@ with tab_alos_yield:
             "Μετρά τη μέση διάρκεια (σε ημέρες) που παραμένει ένας επισκέπτης στην Ελλάδα.\n\n"
             "#### 📈 Ερμηνεία Καμπύλης ALOS (2019-2024):\n"
             "• **2019 Βάση (3.74 Ημέρες):** Ισορροπία διάρκειας ταξιδιού προ πανδημίας.\n"
-            "• **2020 Κρίση Πανδημίας (3.50 Ημέρες):** Πτώση λόγω ταξιδιωτικών περιορισμών και σύντομων αναγκαστικών επιστροφών.\n"
-            "• **2022 Κορυφή Ανάκαμψης (3.81 Ημέρες):** Εκτόξευση λόγω της τάσης 'revenge travel' όπου οι ταξιδιώτες πραγματοποίησαν ταξίδια μεγαλύτερης διάρκειας.\n"
-            "• **2023-2024 Σταθεροποίηση (3.69 Ημέρες):** Ομαλοποίηση στις ~3.7 ημέρες λόγω αύξησης συχνότητας σύντομων ταξιδιών (city-breaks)."
+            "• **2020 Κρίση Πανδημίας (3.50 Ημέρες):** Πτώση λόγω ταξιδιωτικών περιορισμών.\n"
+            "• **2022 Κορυφή Ανάκαμψης (3.81 Ημέρες):** Εκτόξευση λόγω της τάσης 'revenge travel'.\n"
+            "• **2023-2024 Σταθεροποίηση (3.69 Ημέρες):** Ομαλοποίηση στις ~3.7 ημέρες λόγω αύξησης city-breaks."
         )
-    
-    ay_df = df.groupby("geo_label")[["arrivals", "overnights", "receipts"]].sum().reset_index()
+
+    ay_df = (
+        df.groupby("geo_label")[["arrivals", "overnights", "receipts"]]
+        .sum()
+        .reset_index()
+    )
     ay_df["alos"] = ay_df["overnights"] / ay_df["arrivals"]
     ay_df["daily_yield"] = ay_df["receipts"] / ay_df["overnights"]
-    
+
     fig_scatter = px.scatter(
-        ay_df, x="alos", y="daily_yield", size="receipts", color="geo_label",
+        ay_df,
+        x="alos",
+        y="daily_yield",
+        size="receipts",
+        color="geo_label",
         hover_name="geo_label",
         title="ALOS (Days) vs Daily Yield (€/night)",
-        labels={"alos": t("col_alos", lang), "daily_yield": t("col_yield", lang), "geo_label": t("col_geo_label", lang)},
-        size_max=40
+        labels={
+            "alos": t("col_alos", lang),
+            "daily_yield": t("col_yield", lang),
+            "geo_label": t("col_geo_label", lang),
+        },
+        size_max=40,
     )
     st.plotly_chart(fig_scatter, use_container_width=True)
 
 with tab_rec:
     st.subheader("📜 Data-Driven Investment Strategy & Capital Allocation Matrix")
-    
+
     if lang == "en":
         st.markdown(
             "Based on empirical 2019-2024 data, we outline a **3-tier data-driven investment roadmap** "
             "designed to maximize tourism revenue, extend length of stay, and optimize regional yields."
         )
-        
+
         col_inv1, col_inv2, col_inv3 = st.columns(3)
-        
+
         with col_inv1:
             st.markdown(
                 """
@@ -216,9 +301,9 @@ with tab_rec:
                     </div>
                 </div>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
-            
+
         with col_inv2:
             st.markdown(
                 """
@@ -239,7 +324,7 @@ with tab_rec:
                     </div>
                 </div>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
 
         with col_inv3:
@@ -262,16 +347,16 @@ with tab_rec:
                     </div>
                 </div>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
     else:
         st.markdown(
             "Βάσει των πραγματικών δεδομένων 2019-2024, παρουσιάζεται ο **Στρατηγικός Χάρτης Επενδύσεων 3 Πυλώνων** "
             "για τη μεγιστοποίηση των εσόδων, την αύξηση της διάρκειας παραμονής και τη βελτιστοποίηση της απόδοσης."
         )
-        
+
         col_inv1, col_inv2, col_inv3 = st.columns(3)
-        
+
         with col_inv1:
             st.markdown(
                 """
@@ -292,9 +377,9 @@ with tab_rec:
                     </div>
                 </div>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
-            
+
         with col_inv2:
             st.markdown(
                 """
@@ -315,7 +400,7 @@ with tab_rec:
                     </div>
                 </div>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
 
         with col_inv3:
@@ -338,5 +423,5 @@ with tab_rec:
                     </div>
                 </div>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )

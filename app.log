@@ -1,3 +1,180 @@
 2026-07-21 19:11:44,441 - __main__ - INFO - Starting Greek Tourism CLI
 2026-07-21 19:16:44,050 - __main__ - INFO - Starting Greek Tourism CLI
 2026-07-21 19:20:16,453 - __main__ - INFO - Starting Greek Tourism CLI
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Database engine created successfully.
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Fetching tourism data from API endpoint: https://skillscapes.csd.auth.gr/api/data/greek-tourism
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Successfully fetched 2 records from API.
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Fetching tourism data from API endpoint: https://skillscapes.csd.auth.gr/api/data/greek-tourism
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Successfully fetched 2 records from API.
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Fetching tourism data from API endpoint: https://skillscapes.csd.auth.gr/api/data/greek-tourism
+2026-07-26 16:06:42 - greek_tourism - [ERROR] - Failed to fetch data from API: Network Down
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Fetching tourism data from API endpoint: https://skillscapes.csd.auth.gr/api/data/greek-tourism
+2026-07-26 16:06:42 - greek_tourism - [ERROR] - Failed to fetch data from API: 500 Server Error
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Fetching Eurostat NUTS 2 geographic boundaries...
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Eurostat geographic boundaries fetched successfully.
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Fetching Eurostat NUTS 2 geographic boundaries...
+2026-07-26 16:06:42 - greek_tourism - [WARNING] - Could not fetch Eurostat boundaries: Timed out
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Successfully saved 2 records to /private/var/folders/b7/gt1z1b6d6j98bpgj7ct71xxw0000gn/T/pytest-of-andreastsakiris/pytest-0/test_save_raw_data0/test_raw.json
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Execution time for get_top_regions_by_arrivals: 3.57 ms
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Execution time for get_cumulative_arrivals_by_region: 0.51 ms
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Execution time for get_regional_rankings_by_year: 0.71 ms
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Execution time for get_yoy_growth_analysis: 0.54 ms
+2026-07-26 16:06:42 - greek_tourism - [INFO] - EXPLAIN execution plan fetched (1 plan lines).
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Starting ETL data load process...
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Cleared 0 old records from tourism_data table.
+2026-07-26 16:06:42 - greek_tourism - [INFO] - ETL pipeline completed: successfully loaded 2 records.
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Starting ETL data load process...
+2026-07-26 16:06:42 - greek_tourism - [ERROR] - ETL pipeline aborted due to API error: API down
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Starting ETL data load process...
+2026-07-26 16:06:42 - greek_tourism - [INFO] - Cleared 0 old records from tourism_data table.
+2026-07-26 16:06:42 - greek_tourism - [ERROR] - Data validation error for record EL30: 1 validation error for TourismDataRecord
+year
+  Input should be greater than or equal to 2000 [type=greater_than_equal, input_value=1800, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.13/v/greater_than_equal
+2026-07-26 16:06:42 - greek_tourism - [INFO] - ETL pipeline completed: successfully loaded 1 records.
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Database engine created successfully.
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Fetching tourism data from API endpoint: https://skillscapes.csd.auth.gr/api/data/greek-tourism
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Successfully fetched 2 records from API.
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Fetching tourism data from API endpoint: https://skillscapes.csd.auth.gr/api/data/greek-tourism
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Successfully fetched 2 records from API.
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Fetching tourism data from API endpoint: https://skillscapes.csd.auth.gr/api/data/greek-tourism
+2026-07-26 16:07:20 - greek_tourism - [ERROR] - Failed to fetch data from API: Network Down
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Fetching tourism data from API endpoint: https://skillscapes.csd.auth.gr/api/data/greek-tourism
+2026-07-26 16:07:20 - greek_tourism - [ERROR] - Failed to fetch data from API: 500 Server Error
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Fetching Eurostat NUTS 2 geographic boundaries...
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Eurostat geographic boundaries fetched successfully.
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Fetching Eurostat NUTS 2 geographic boundaries...
+2026-07-26 16:07:20 - greek_tourism - [WARNING] - Could not fetch Eurostat boundaries: Timed out
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Successfully saved 2 records to /private/var/folders/b7/gt1z1b6d6j98bpgj7ct71xxw0000gn/T/pytest-of-andreastsakiris/pytest-1/test_save_raw_data0/test_raw.json
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Execution time for get_top_regions_by_arrivals: 9.42 ms
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Execution time for get_cumulative_arrivals_by_region: 0.53 ms
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Execution time for get_regional_rankings_by_year: 0.85 ms
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Execution time for get_yoy_growth_analysis: 0.56 ms
+2026-07-26 16:07:20 - greek_tourism - [INFO] - EXPLAIN execution plan fetched (1 plan lines).
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Starting ETL data load process...
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Cleared 0 old records from tourism_data table.
+2026-07-26 16:07:20 - greek_tourism - [INFO] - ETL pipeline completed: successfully loaded 2 records.
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Starting ETL data load process...
+2026-07-26 16:07:20 - greek_tourism - [ERROR] - ETL pipeline aborted due to API error: API down
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Starting ETL data load process...
+2026-07-26 16:07:20 - greek_tourism - [INFO] - Cleared 0 old records from tourism_data table.
+2026-07-26 16:07:20 - greek_tourism - [ERROR] - Data validation error for record EL30: 1 validation error for TourismDataRecord
+year
+  Input should be greater than or equal to 2000 [type=greater_than_equal, input_value=1800, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.13/v/greater_than_equal
+2026-07-26 16:07:20 - greek_tourism - [INFO] - ETL pipeline completed: successfully loaded 1 records.
+2026-07-26 16:08:17 - greek_tourism - [INFO] - Database engine created successfully.
+2026-07-26 16:08:17 - greek_tourism - [INFO] - Starting cProfile performance benchmarking for 'get_top_regions_by_arrivals'...
+2026-07-26 16:08:18 - greek_tourism - [ERROR] - Error fetching top regions by arrivals: (psycopg2.OperationalError) connection to server at "localhost" (::1), port 5432 failed: FATAL:  password authentication failed for user "andreastsakiris"
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-07-26 16:08:18 - greek_tourism - [INFO] - Execution time for get_top_regions_by_arrivals: 264.43 ms
+2026-07-26 16:08:24 - greek_tourism - [INFO] - Database engine created successfully.
+2026-07-26 16:08:24 - greek_tourism - [INFO] - Starting cProfile performance benchmarking for 'get_top_regions_by_arrivals'...
+2026-07-26 16:08:24 - greek_tourism - [INFO] - Execution time for get_top_regions_by_arrivals: 9.55 ms
+2026-07-26 16:08:24 - greek_tourism - [INFO] - --- Performance Profile Report for get_top_regions_by_arrivals ---
+         7357 function calls (7081 primitive calls) in 0.010 seconds
+
+   Ordered by: cumulative time
+   List reduced from 570 to 15 due to restriction <15>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.010    0.010 /Users/andreastsakiris/GreekTourismProject/queries.py:19(wrapper)
+        1    0.000    0.000    0.010    0.010 /Users/andreastsakiris/GreekTourismProject/queries.py:30(get_top_regions_by_arrivals)
+        1    0.000    0.000    0.009    0.009 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:539(read_sql)
+        1    0.000    0.000    0.009    0.009 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:1801(read_query)
+        1    0.000    0.000    0.009    0.009 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:195(_wrap_result)
+        1    0.000    0.000    0.007    0.007 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:160(_convert_arrays_to_dataframe)
+        1    0.000    0.000    0.007    0.007 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/core/internals/construction.py:977(convert_object_array)
+        3    0.000    0.000    0.007    0.002 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/core/internals/construction.py:999(convert)
+        2    0.002    0.001    0.006    0.003 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/core/arrays/string_arrow.py:195(_from_sequence)
+        3    0.000    0.000    0.003    0.001 <frozen importlib._bootstrap>:1360(_find_and_load)
+        2    0.000    0.000    0.003    0.001 <frozen importlib._bootstrap>:1308(_find_and_load_unlocked)
+        2    0.000    0.000    0.003    0.001 <frozen importlib._bootstrap>:914(_load_unlocked)
+        2    0.000    0.000    0.003    0.001 <frozen importlib._bootstrap_external>:753(exec_module)
+        3    0.000    0.000    0.002    0.001 {built-in method builtins.exec}
+        4    0.000    0.000    0.002    0.000 <frozen importlib._bootstrap>:483(_call_with_frames_removed)
+
+
+
+2026-07-26 16:08:24 - greek_tourism - [INFO] - Starting cProfile performance benchmarking for 'get_cumulative_arrivals_by_region'...
+2026-07-26 16:08:24 - greek_tourism - [INFO] - Execution time for get_cumulative_arrivals_by_region: 1.06 ms
+2026-07-26 16:08:24 - greek_tourism - [INFO] - --- Performance Profile Report for get_cumulative_arrivals_by_region ---
+         1030 function calls (1016 primitive calls) in 0.001 seconds
+
+   Ordered by: cumulative time
+   List reduced from 369 to 15 due to restriction <15>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.001    0.001 /Users/andreastsakiris/GreekTourismProject/queries.py:19(wrapper)
+        1    0.000    0.000    0.001    0.001 /Users/andreastsakiris/GreekTourismProject/queries.py:65(get_cumulative_arrivals_by_region)
+        1    0.000    0.000    0.001    0.001 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:539(read_sql)
+        1    0.000    0.000    0.001    0.001 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:1801(read_query)
+        1    0.000    0.000    0.001    0.001 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:195(_wrap_result)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:160(_convert_arrays_to_dataframe)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/core/frame.py:2617(_from_arrays)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:1668(execute)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1377(execute)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/sqlalchemy/sql/elements.py:517(_execute_on_connection)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1593(_execute_clauseelement)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:139(_parse_date_columns)
+        5    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/core/frame.py:1484(items)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1793(_execute_context)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/core/internals/construction.py:977(convert_object_array)
+
+
+
+2026-07-26 16:08:24 - greek_tourism - [INFO] - Starting cProfile performance benchmarking for 'get_regional_rankings_by_year'...
+2026-07-26 16:08:24 - greek_tourism - [INFO] - Execution time for get_regional_rankings_by_year: 1.77 ms
+2026-07-26 16:08:24 - greek_tourism - [INFO] - --- Performance Profile Report for get_regional_rankings_by_year ---
+         1215 function calls (1200 primitive calls) in 0.002 seconds
+
+   Ordered by: cumulative time
+   List reduced from 395 to 15 due to restriction <15>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.002    0.002 /Users/andreastsakiris/GreekTourismProject/queries.py:19(wrapper)
+        1    0.000    0.000    0.002    0.002 /Users/andreastsakiris/GreekTourismProject/queries.py:102(get_regional_rankings_by_year)
+        1    0.000    0.000    0.002    0.002 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:539(read_sql)
+        1    0.000    0.000    0.001    0.001 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:1801(read_query)
+        1    0.000    0.000    0.001    0.001 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:195(_wrap_result)
+        1    0.000    0.000    0.001    0.001 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:160(_convert_arrays_to_dataframe)
+        1    0.000    0.000    0.001    0.001 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/core/frame.py:2617(_from_arrays)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:1668(execute)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1377(execute)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/sqlalchemy/sql/elements.py:517(_execute_on_connection)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1593(_execute_clauseelement)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/core/internals/construction.py:96(arrays_to_mgr)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1793(_execute_context)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/core/internals/managers.py:2332(create_block_manager_from_column_arrays)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1852(_exec_single_context)
+
+
+
+2026-07-26 16:08:24 - greek_tourism - [INFO] - Starting cProfile performance benchmarking for 'get_yoy_growth_analysis'...
+2026-07-26 16:08:24 - greek_tourism - [INFO] - Execution time for get_yoy_growth_analysis: 0.95 ms
+2026-07-26 16:08:24 - greek_tourism - [INFO] - --- Performance Profile Report for get_yoy_growth_analysis ---
+         1101 function calls (1086 primitive calls) in 0.001 seconds
+
+   Ordered by: cumulative time
+   List reduced from 369 to 15 due to restriction <15>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.001    0.001 /Users/andreastsakiris/GreekTourismProject/queries.py:19(wrapper)
+        1    0.000    0.000    0.001    0.001 /Users/andreastsakiris/GreekTourismProject/queries.py:139(get_yoy_growth_analysis)
+        1    0.000    0.000    0.001    0.001 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:539(read_sql)
+        1    0.000    0.000    0.001    0.001 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:1801(read_query)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:195(_wrap_result)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:160(_convert_arrays_to_dataframe)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:1668(execute)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1377(execute)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/sqlalchemy/sql/elements.py:517(_execute_on_connection)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1593(_execute_clauseelement)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/core/frame.py:2617(_from_arrays)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/io/sql.py:139(_parse_date_columns)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1793(_execute_context)
+        6    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/core/frame.py:1484(items)
+        1    0.000    0.000    0.000    0.000 /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pandas/core/internals/construction.py:977(convert_object_array)
+
+
+
