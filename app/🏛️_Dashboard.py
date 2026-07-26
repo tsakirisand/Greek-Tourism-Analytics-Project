@@ -4,6 +4,7 @@ Main Streamlit Dashboard page for Greek Tourism Analytics.
 
 import os
 import sys
+from typing import Any, Dict
 import pandas as pd
 from sqlalchemy import text
 import streamlit as st

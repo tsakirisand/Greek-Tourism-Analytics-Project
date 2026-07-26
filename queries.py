@@ -63,9 +63,7 @@ def get_top_regions_by_arrivals(
 
 
 @time_execution
-def get_cumulative_arrivals_by_region(
-    engine: Optional[Engine] = None,
-) -> pd.DataFrame:
+def get_cumulative_arrivals_by_region(engine: Optional[Engine] = None) -> pd.DataFrame:
     """Calculates cumulative arrivals per region over time using SQL window functions (SUM OVER).
 
     Args:
@@ -80,13 +78,13 @@ def get_cumulative_arrivals_by_region(
         return pd.DataFrame()
 
     query = text("""
-        SELECT
+        SELECT 
             geo_label,
             year,
             arrivals,
             SUM(arrivals) OVER (
-                PARTITION BY geo_label
-                ORDER BY year
+                PARTITION BY geo_label 
+                ORDER BY year 
                 ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
             ) AS cumulative_arrivals
         FROM tourism_data
@@ -102,9 +100,7 @@ def get_cumulative_arrivals_by_region(
 
 
 @time_execution
-def get_regional_rankings_by_year(
-    engine: Optional[Engine] = None,
-) -> pd.DataFrame:
+def get_regional_rankings_by_year(engine: Optional[Engine] = None) -> pd.DataFrame:
     """Ranks regions per year using window functions (RANK OVER PARTITION BY).
 
     Args:
@@ -119,13 +115,13 @@ def get_regional_rankings_by_year(
         return pd.DataFrame()
 
     query = text("""
-        SELECT
+        SELECT 
             year,
             geo_label,
             arrivals,
             receipts,
             RANK() OVER (
-                PARTITION BY year
+                PARTITION BY year 
                 ORDER BY arrivals DESC
             ) AS arrival_rank
         FROM tourism_data
@@ -156,19 +152,19 @@ def get_yoy_growth_analysis(engine: Optional[Engine] = None) -> pd.DataFrame:
         return pd.DataFrame()
 
     query = text("""
-        SELECT
+        SELECT 
             geo_label,
             year,
             arrivals,
             LAG(arrivals) OVER (
-                PARTITION BY geo_label
+                PARTITION BY geo_label 
                 ORDER BY year
             ) AS prev_year_arrivals,
             ROUND(
                 CAST(
-                    (arrivals - LAG(arrivals) OVER (PARTITION BY geo_label ORDER BY year))
-                    / NULLIF(LAG(arrivals) OVER (PARTITION BY geo_label ORDER BY year), 0) * 100
-                AS NUMERIC),
+                    (arrivals - LAG(arrivals) OVER (PARTITION BY geo_label ORDER BY year)) 
+                    / NULLIF(LAG(arrivals) OVER (PARTITION BY geo_label ORDER BY year), 0) * 100 
+                AS NUMERIC), 
             2) AS yoy_growth_pct
         FROM tourism_data
         ORDER BY geo_label, year

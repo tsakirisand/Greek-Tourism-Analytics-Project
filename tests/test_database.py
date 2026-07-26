@@ -4,11 +4,12 @@ Unit tests for database module and queries.
 
 import os
 from unittest.mock import patch
+import pandas as pd
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from database import get_database_url, get_engine
+from database import get_database_url, get_engine, get_session
 from models import Base, TourismData
 from queries import (
     explain_query,
@@ -41,18 +42,10 @@ def populate_test_data(db_session):
     """Populates test data across multiple regions and years into the database."""
     records = [
         TourismData(
-            geo="EL30",
-            geo_label="Attiki",
-            year=2022,
-            arrivals=100.0,
-            receipts=500.0,
+            geo="EL30", geo_label="Attiki", year=2022, arrivals=100.0, receipts=500.0
         ),
         TourismData(
-            geo="EL30",
-            geo_label="Attiki",
-            year=2023,
-            arrivals=150.0,
-            receipts=750.0,
+            geo="EL30", geo_label="Attiki", year=2023, arrivals=150.0, receipts=750.0
         ),
         TourismData(
             geo="EL42",

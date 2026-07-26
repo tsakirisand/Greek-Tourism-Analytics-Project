@@ -271,3 +271,65 @@ year
   Input should be greater than or equal to 2000 [type=greater_than_equal, input_value=1800, input_type=int]
     For further information visit https://errors.pydantic.dev/2.13/v/greater_than_equal
 2026-07-26 16:26:49 - greek_tourism - [INFO] - ETL pipeline completed: successfully loaded 1 records.
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Database engine created successfully.
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Fetching tourism data from API endpoint: https://skillscapes.csd.auth.gr/api/data/greek-tourism
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Successfully fetched 2 records from API.
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Fetching tourism data from API endpoint: https://skillscapes.csd.auth.gr/api/data/greek-tourism
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Successfully fetched 2 records from API.
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Fetching tourism data from API endpoint: https://skillscapes.csd.auth.gr/api/data/greek-tourism
+2026-07-26 16:32:47 - greek_tourism - [ERROR] - Failed to fetch data from API: Network Down
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Fetching tourism data from API endpoint: https://skillscapes.csd.auth.gr/api/data/greek-tourism
+2026-07-26 16:32:47 - greek_tourism - [ERROR] - Failed to fetch data from API: 500 Server Error
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Fetching Eurostat NUTS 2 geographic boundaries...
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Eurostat geographic boundaries fetched successfully.
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Fetching Eurostat NUTS 2 geographic boundaries...
+2026-07-26 16:32:47 - greek_tourism - [WARNING] - Could not fetch Eurostat boundaries: Timed out
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Successfully saved 2 records to /private/var/folders/b7/gt1z1b6d6j98bpgj7ct71xxw0000gn/T/pytest-of-andreastsakiris/pytest-5/test_save_raw_data0/test_raw.json
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Execution time for get_top_regions_by_arrivals: 11.50 ms
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Execution time for get_cumulative_arrivals_by_region: 0.59 ms
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Execution time for get_regional_rankings_by_year: 0.85 ms
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Execution time for get_yoy_growth_analysis: 0.60 ms
+2026-07-26 16:32:47 - greek_tourism - [INFO] - EXPLAIN execution plan fetched (1 plan lines).
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Starting ETL data load process...
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Cleared 0 old records from tourism_data table.
+2026-07-26 16:32:47 - greek_tourism - [INFO] - ETL pipeline completed: successfully loaded 2 records.
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Starting ETL data load process...
+2026-07-26 16:32:47 - greek_tourism - [ERROR] - ETL pipeline aborted due to API error: API down
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Starting ETL data load process...
+2026-07-26 16:32:47 - greek_tourism - [INFO] - Cleared 0 old records from tourism_data table.
+2026-07-26 16:32:47 - greek_tourism - [ERROR] - Data validation error for record EL30: 1 validation error for TourismDataRecord
+year
+  Input should be greater than or equal to 2000 [type=greater_than_equal, input_value=1800, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.13/v/greater_than_equal
+2026-07-26 16:32:47 - greek_tourism - [INFO] - ETL pipeline completed: successfully loaded 1 records.
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Database engine created successfully.
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Fetching tourism data from API endpoint: https://skillscapes.csd.auth.gr/api/data/greek-tourism
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Successfully fetched 2 records from API.
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Fetching tourism data from API endpoint: https://skillscapes.csd.auth.gr/api/data/greek-tourism
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Successfully fetched 2 records from API.
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Fetching tourism data from API endpoint: https://skillscapes.csd.auth.gr/api/data/greek-tourism
+2026-07-26 16:33:19 - greek_tourism - [ERROR] - Failed to fetch data from API: Network Down
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Fetching tourism data from API endpoint: https://skillscapes.csd.auth.gr/api/data/greek-tourism
+2026-07-26 16:33:19 - greek_tourism - [ERROR] - Failed to fetch data from API: 500 Server Error
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Fetching Eurostat NUTS 2 geographic boundaries...
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Eurostat geographic boundaries fetched successfully.
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Fetching Eurostat NUTS 2 geographic boundaries...
+2026-07-26 16:33:19 - greek_tourism - [WARNING] - Could not fetch Eurostat boundaries: Timed out
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Successfully saved 2 records to /private/var/folders/b7/gt1z1b6d6j98bpgj7ct71xxw0000gn/T/pytest-of-andreastsakiris/pytest-6/test_save_raw_data0/test_raw.json
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Execution time for get_top_regions_by_arrivals: 7.47 ms
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Execution time for get_cumulative_arrivals_by_region: 0.56 ms
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Execution time for get_regional_rankings_by_year: 0.64 ms
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Execution time for get_yoy_growth_analysis: 0.59 ms
+2026-07-26 16:33:19 - greek_tourism - [INFO] - EXPLAIN execution plan fetched (1 plan lines).
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Starting ETL data load process...
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Cleared 0 old records from tourism_data table.
+2026-07-26 16:33:19 - greek_tourism - [INFO] - ETL pipeline completed: successfully loaded 2 records.
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Starting ETL data load process...
+2026-07-26 16:33:19 - greek_tourism - [ERROR] - ETL pipeline aborted due to API error: API down
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Starting ETL data load process...
+2026-07-26 16:33:19 - greek_tourism - [INFO] - Cleared 0 old records from tourism_data table.
+2026-07-26 16:33:19 - greek_tourism - [ERROR] - Data validation error for record EL30: 1 validation error for TourismDataRecord
+year
+  Input should be greater than or equal to 2000 [type=greater_than_equal, input_value=1800, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.13/v/greater_than_equal
+2026-07-26 16:33:19 - greek_tourism - [INFO] - ETL pipeline completed: successfully loaded 1 records.

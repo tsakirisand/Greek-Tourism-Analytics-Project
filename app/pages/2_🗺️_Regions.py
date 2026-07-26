@@ -4,7 +4,7 @@ Regional Analysis Streamlit page featuring choropleth map visualization and cros
 
 import os
 import sys
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 import pandas as pd
 import plotly.express as px
 from sqlalchemy import text
