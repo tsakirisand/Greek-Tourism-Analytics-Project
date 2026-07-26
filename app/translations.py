@@ -210,7 +210,7 @@ def t(key: str, lang: str = "el", **kwargs) -> str:
     if kwargs:
         try:
             return text_template.format(**kwargs)
-        except Exception as e:
+        except Exception:
             # Format failure fallback safely without crashing or leaking raw syntax
             return text_template
     return text_template

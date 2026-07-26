@@ -4,7 +4,6 @@ Strategic Insights Streamlit page for executive storytelling, investment analysi
 
 import os
 import sys
-from typing import Any
 import pandas as pd
 import plotly.express as px
 from sqlalchemy import text

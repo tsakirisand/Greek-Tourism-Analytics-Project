@@ -6,9 +6,10 @@ import cProfile
 import pstats
 from io import StringIO
 from typing import Any, Callable
-from sqlalchemy import create_engine
 
-from loader import transform_data
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
 from logger import logger
 from models import Base, TourismData
 from queries import (
@@ -23,9 +24,7 @@ def create_mock_benchmark_engine():
     """Creates an in-memory SQLite engine with sample data for benchmark execution."""
     engine = create_engine("sqlite:///:memory:")
     Base.metadata.create_all(engine)
-    with engine.connect() as conn:
-        from sqlalchemy.orm import sessionmaker
-
+    with engine.connect():
         Session = sessionmaker(bind=engine)
         session = Session()
         sample_records = [

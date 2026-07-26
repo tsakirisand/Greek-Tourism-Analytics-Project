@@ -3,7 +3,7 @@ Reusable Streamlit UI components, custom styling, sidebar management, and cache 
 """
 
 import os
-from typing import Any, Dict, List, Optional
+from typing import Optional
 import pandas as pd
 import streamlit as st
 
@@ -17,11 +17,11 @@ def apply_custom_css() -> None:
         """
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-            
+
             html, body, [class*="css"]  {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             }
-            
+
             .metric-card {
                 background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%);
                 padding: 18px 14px;
@@ -60,7 +60,7 @@ def apply_custom_css() -> None:
                 letter-spacing: 0.6px;
                 white-space: nowrap;
             }
-            
+
             thead tr th {
                 background-color: #005BAE !important;
                 color: white !important;
@@ -234,7 +234,12 @@ def generate_pdf_report(df: pd.DataFrame, lang: str = "el") -> bytes:
     pdf.cell(0, 6, f"- Total Overnights: {total_overnights:,.0f}", ln=True)
     pdf.cell(0, 6, f"- Total Tourism Receipts: EUR {total_receipts:,.0f}", ln=True)
     pdf.cell(0, 6, f"- Average Spend per Tourist: EUR {avg_spend:,.2f}", ln=True)
-    pdf.cell(0, 6, f"- Average Length of Stay (ALOS): {alos:.2f} days/visitor", ln=True)
+    pdf.cell(
+        0,
+        6,
+        f"- Average Length of Stay (ALOS): {alos:.2f} days/visitor",
+        ln=True,
+    )
     pdf.cell(
         0, 6, f"- Daily Yield per Overnight: EUR {daily_yield:,.2f}/night", ln=True
     )
