@@ -29,10 +29,34 @@ def create_mock_benchmark_engine():
         Session = sessionmaker(bind=engine)
         session = Session()
         sample_records = [
-            TourismData(geo="EL30", geo_label="Attiki", year=2022, arrivals=1000.0, receipts=5000.0),
-            TourismData(geo="EL30", geo_label="Attiki", year=2023, arrivals=1500.0, receipts=7500.0),
-            TourismData(geo="EL42", geo_label="Notio Aigaio", year=2022, arrivals=2000.0, receipts=10000.0),
-            TourismData(geo="EL42", geo_label="Notio Aigaio", year=2023, arrivals=2500.0, receipts=12500.0),
+            TourismData(
+                geo="EL30",
+                geo_label="Attiki",
+                year=2022,
+                arrivals=1000.0,
+                receipts=5000.0,
+            ),
+            TourismData(
+                geo="EL30",
+                geo_label="Attiki",
+                year=2023,
+                arrivals=1500.0,
+                receipts=7500.0,
+            ),
+            TourismData(
+                geo="EL42",
+                geo_label="Notio Aigaio",
+                year=2022,
+                arrivals=2000.0,
+                receipts=10000.0,
+            ),
+            TourismData(
+                geo="EL42",
+                geo_label="Notio Aigaio",
+                year=2023,
+                arrivals=2500.0,
+                receipts=12500.0,
+            ),
         ]
         session.add_all(sample_records)
         session.commit()
@@ -62,7 +86,9 @@ def profile_function(func: Callable[..., Any], *args: Any, **kwargs: Any) -> Any
     stats = pstats.Stats(profiler, stream=stream).sort_stats(pstats.SortKey.CUMULATIVE)
     stats.print_stats(15)
 
-    logger.info(f"--- Performance Profile Report for {func.__name__} ---\n{stream.getvalue()}")
+    logger.info(
+        f"--- Performance Profile Report for {func.__name__} ---\n{stream.getvalue()}"
+    )
     return result
 
 
