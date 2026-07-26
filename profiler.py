@@ -76,19 +76,20 @@ def profile_function(func: Callable[..., Any], *args: Any, **kwargs: Any) -> Any
         Any: Return value of the callable.
     """
     profiler = cProfile.Profile()
-    logger.info(f"Starting cProfile performance benchmarking for '{func.__name__}'...")
+    func_name = func.__name__
+    logger.info(f"Starting cProfile benchmarking for '{func_name}'...")
 
     profiler.enable()
     result = func(*args, **kwargs)
     profiler.disable()
 
     stream = StringIO()
-    stats = pstats.Stats(profiler, stream=stream).sort_stats(pstats.SortKey.CUMULATIVE)
+    stats = pstats.Stats(profiler, stream=stream)
+    stats.sort_stats(pstats.SortKey.CUMULATIVE)
     stats.print_stats(15)
 
-    logger.info(
-        f"--- Performance Profile Report for {func.__name__} ---\n{stream.getvalue()}"
-    )
+    report_header = f"--- Performance Profile Report for {func_name} ---"
+    logger.info(f"{report_header}\n{stream.getvalue()}")
     return result
 
 
