@@ -1,18 +1,22 @@
 """
-ETL pipeline loader module to fetch, validate, transform, and load API data into PostgreSQL.
+ETL pipeline loader module executing the multi-stage enterprise pipeline:
+    API -> Raw JSON/CSV -> S3 -> Airflow -> Data Validation -> PySpark -> PostgreSQL/Warehouse -> SQL Analytics -> Dashboard
 """
 
-from typing import Optional
+import json
+import os
+from typing import Any, Dict, List, Optional
 import pandas as pd
-from pydantic import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from api_client import APIError, get_tourism_data
+from data_validator import assert_pipeline_quality, validate_records
 from database import get_session
 from logger import logger
 from models import TourismData
-from schemas import TourismDataRecord
+from pyspark_processor import process_with_pyspark
+from s3_client import upload_to_s3
 
 
 def transform_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -46,8 +50,31 @@ def transform_data(df: pd.DataFrame) -> pd.DataFrame:
     return transformed
 
 
+def save_raw_files(raw_data: List[Dict[str, Any]]) -> Dict[str, str]:
+    """Persists raw API responses as JSON and CSV local staging files.
+
+    Args:
+        raw_data: List of raw dictionaries.
+
+    Returns:
+        Dict[str, str]: Map of local raw file paths.
+    """
+    os.makedirs("data/raw", exist_ok=True)
+    json_path = "data/raw/tourism_data.json"
+    csv_path = "data/raw/tourism_data.csv"
+
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(raw_data, f, indent=2, ensure_ascii=False)
+
+    df_raw = pd.DataFrame(raw_data)
+    df_raw.to_csv(csv_path, index=False, encoding="utf-8")
+
+    logger.info(f"Persisted Raw JSON ({json_path}) and CSV ({csv_path}).")
+    return {"json_path": json_path, "csv_path": csv_path}
+
+
 def load(session_override: Optional[Session] = None) -> int:
-    """Fetches data from the API, validates it using Pydantic, and loads it into the database.
+    """Executes the full 9-stage ETL pipeline into the PostgreSQL database.
 
     Args:
         session_override: Optional SQLAlchemy Session object for testing.
@@ -55,7 +82,9 @@ def load(session_override: Optional[Session] = None) -> int:
     Returns:
         int: Total number of valid records inserted into the database.
     """
-    logger.info("Starting ETL data load process...")
+    logger.info("Starting Enterprise ETL data load process...")
+
+    # Stage 1: API Fetch
     try:
         raw_data = get_tourism_data()
     except APIError as e:
@@ -66,6 +95,28 @@ def load(session_override: Optional[Session] = None) -> int:
         logger.warning("No data received from API. Aborting load.")
         return 0
 
+    # Stage 2: Raw JSON / CSV Persist
+    save_raw_files(raw_data)
+
+    # Stage 3: S3 Bucket Upload
+    try:
+        upload_to_s3(raw_data, pd.DataFrame(raw_data))
+    except Exception as e:
+        logger.warning(f"S3 upload step encountered warning: {e}")
+
+    # Stage 5: Data Validation Layer
+    valid_records, invalid_records = validate_records(raw_data)
+    try:
+        assert_pipeline_quality(valid_records, min_records=1)
+    except Exception as ve:
+        logger.error(f"Data Validation quality assertion failed: {ve}")
+        return 0
+
+    # Stage 6: PySpark Transformation Engine
+    raw_dicts_to_transform = [r.model_dump() for r in valid_records]
+    spark_transformed_records = process_with_pyspark(raw_dicts_to_transform)
+
+    # Stage 7: PostgreSQL Warehouse Loading
     session = session_override if session_override is not None else get_session()
     if session is None:
         logger.error("Database session unavailable. Aborting load.")
@@ -79,26 +130,19 @@ def load(session_override: Optional[Session] = None) -> int:
         logger.info(f"Cleared {deleted_count} old records from tourism_data table.")
 
         inserted_count = 0
-        for item in raw_data:
-            try:
-                valid_record = TourismDataRecord(**item)
-
-                row = TourismData(
-                    geo=valid_record.geo,
-                    geo_label=valid_record.geo_label,
-                    year=valid_record.year,
-                    arrivals=valid_record.hotels_total_arrivals,
-                    overnights=valid_record.hotels_total_overnights,
-                    occupancy=valid_record.hotels_occupancy,
-                    receipts=valid_record.receipts,
-                    turnover=valid_record.turnover_total,
-                )
-                session.add(row)
-                inserted_count += 1
-            except ValidationError as ve:
-                logger.error(
-                    f"Data validation error for record {item.get('geo')}: {ve}"
-                )
+        for rec in spark_transformed_records:
+            row = TourismData(
+                geo=rec.get("geo"),
+                geo_label=rec.get("geo_label"),
+                year=rec.get("year"),
+                arrivals=rec.get("arrivals", rec.get("hotels_total_arrivals")),
+                overnights=rec.get("overnights", rec.get("hotels_total_overnights")),
+                occupancy=rec.get("occupancy", rec.get("hotels_occupancy")),
+                receipts=rec.get("receipts", 0.0),
+                turnover=rec.get("turnover", 0.0),
+            )
+            session.add(row)
+            inserted_count += 1
 
         session.commit()
         logger.info(

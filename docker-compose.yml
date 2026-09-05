@@ -12,6 +12,14 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  localstack-s3:
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - AWS_DEFAULT_REGION=us-east-1
+
   streamlit-app:
     build: .
     ports:
@@ -22,8 +30,11 @@ services:
       DB_HOST: db
       DB_PORT: 5432
       DB_NAME: ${DB_NAME:-greek_tourism}
+      S3_ENDPOINT_URL: http://localstack-s3:4566
+      S3_BUCKET_NAME: greek-tourism-raw-bucket
     depends_on:
       - db
+      - localstack-s3
 
 volumes:
   postgres_data:

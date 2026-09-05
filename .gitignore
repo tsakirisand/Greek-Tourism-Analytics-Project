@@ -24,6 +24,9 @@ app.log
 .pytest_cache/
 .coverage
 coverage.xml
+data/raw/
+data/s3_bucket/
 
 # Docker
 docker-compose.override.yml
+

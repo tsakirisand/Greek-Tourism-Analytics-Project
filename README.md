@@ -17,49 +17,40 @@ An enterprise-grade data analytics and visualization application for Greek touri
 
 ## 🏗️ Architecture Diagram
 
+```
+        API
+         ↓
+   Raw JSON / CSV
+         ↓
+      S3 ☁️
+         ↓
+     Airflow
+         ↓
+   Data Validation
+         ↓
+      PySpark
+         ↓
+ PostgreSQL / Warehouse
+         ↓
+    SQL Analytics
+         ↓
+    Dashboard
+```
+
 ```mermaid
 flowchart TD
-    subgraph External APIs
-        API1["Skillscapes Greek Tourism API"]
-        API2["Eurostat NUTS 2 GeoJSON API"]
-    end
-
-    subgraph Data Pipeline & ETL
-        Client["api_client.py (API Fetcher & Retry)"]
-        Validator["schemas.py (Pydantic Schema Validation)"]
-        ETL["loader.py (Transform & Scaling)"]
-        Fallback["data/raw_data.json (Local JSON Fallback)"]
-    end
-
-    subgraph Database Layer
-        DB[("PostgreSQL Database\nIndexes: year, geo_label")]
-        SQLQueries["queries.py\n(Window Functions: SUM, RANK, YoY LAG)"]
-    end
-
-    subgraph Presentation & UI Layer
-        Dash["Main Dashboard (🏛️_Dashboard.py)"]
-        Trends["Trends Page (1_📈_Trends.py)"]
-        Regions["Regional Map Page (2_🗺️_Regions.py)"]
-        Insights["Insights Page (3_💡_Insights.py)"]
-        Cache["@st.cache_data (TTL=3600s)\n@st.cache_resource"]
-    end
-
-    API1 --> Client
-    API2 --> Client
-    Client --> Validator
-    Validator --> ETL
-    ETL --> DB
-    ETL -- Failure Fallback --> Fallback
-    DB --> SQLQueries
-    SQLQueries --> Cache
-    Fallback --> Cache
-    Cache --> Dash
-    Cache --> Trends
-    Cache --> Regions
-    Cache --> Insights
+    API["API\n(Skillscapes / GeoJSON)"] --> RAW["Raw JSON / CSV\n(Local Staging Payload)"]
+    RAW --> S3["S3 ☁️\n(boto3 / LocalStack Storage)"]
+    S3 --> AIRFLOW["Airflow 🌀\n(dags/greek_tourism_pipeline.py)"]
+    AIRFLOW --> VAL["Data Validation 🛡️\n(Pydantic & Quality Assertions)"]
+    VAL --> SPARK["PySpark ⚡\n(Distributed ETL & Scaling Engine)"]
+    SPARK --> PG[("PostgreSQL / Warehouse 🐘\n(Indexed Schema & Tables)")]
+    PG --> SQL["SQL Analytics 📈\n(queries.py: SUM, RANK, YoY LAG)"]
+    SQL --> DASH["Dashboard 🏛️\n(Streamlit & Interactive Maps)"]
 ```
 
 ---
+
 
 ## 🌟 Key Features
 
