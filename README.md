@@ -423,16 +423,6 @@ Analysis of verified project data across the 2019–2024 period reveals key tour
 2. **Post-Pandemic Tourism Recovery:** Tourist arrivals experienced a decline in 2020 followed by a steady multi-year recovery trajectory, achieving pre-pandemic volume milestones by 2023–2024.
 3. **Length of Stay vs. Yield Dynamics:** While island regions lead in aggregate overnight stays and overall monetary receipts, urban regions demonstrate distinct visitor turn-over patterns and seasonal stay durations.
 
----
-
-## 🔮 Future Improvements
-
-1. **dbt Integration:** Incorporate dbt (data build tool) to manage SQL transformation models and documentation natively inside the data warehouse.
-2. **Automated Incremental Ingestion:** Implement incremental CDC (Change Data Capture) or delta updates in the Airflow DAG instead of full table truncation reload.
-3. **Great Expectations Quality Suite:** Expand Pydantic schemas with Great Expectations data quality contracts for automated pipeline monitoring and alerting.
-4. **ClickHouse Data Warehouse Migration:** Evaluate ClickHouse columnar storage for high-concurrency analytical querying over multi-million record scale.
-5. **Machine Learning Tourism Demand Forecasting:** Integrate Prophet or ARIMA time-series models into Streamlit to project regional visitor arrivals 12 months ahead.
-6. **Managed Cloud Deployment (AWS ECS / RDS):** Transition production deployment from Render container instances to AWS ECS Fargate with Amazon RDS PostgreSQL.
 
 ---
 
