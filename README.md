@@ -6,7 +6,7 @@ An enterprise-grade data engineering and analytics platform that processes, vali
 
 ## 🚀 Live Demo
 
-🔗 **Public Application URL:** [https://greek-tourism-analytics-project.onrender.com](https://greek-tourism-analytics-project.onrender.com)
+🔗 **Public Application URL:** [https://greek-tourism-analytics-project.streamlit.app](https://greek-tourism-analytics-project.streamlit.app)
 
 ---
 
